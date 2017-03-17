@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# korvaa tämä omalla käyttäjätunnuksellasi
-USERNAME="kalleilv"
-# korvaa tämä haluamallasi kansion nimellä
+USERNAME="jarnoluu"
+SERVER="localhost"
+PORT=9922
 PROJECT_FOLDER="tsoha"
-# sovelluksesi tulee sijaitsemaan osoitteessa USERNAME.users.cs.helsinki.fi/PROJECT_FOLDER
