@@ -31,9 +31,9 @@
   $routes = new \Slim\Slim();
   $routes->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware);
 
-  $routes->get('/tietokantayhteys', function(){
+  /*$routes->get('/tietokantayhteys', function(){
     DB::test_connection();
-  });
+  });*/
 
   // Otetaan reitit käyttöön
   require 'config/routes.php';

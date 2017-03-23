@@ -1,19 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="page-header">
-		<h1>Keskustelualue</h1>
+	<h3>Alueet</h3>
+	<div id="categories">
+	<ul>
+	<li class="selected"><a href="#">Kaikki</a></li>
+	<li><a href="#">Yleinen</a></li>
+	<li><a href="#">Maailmanparannus</a></li>
+	<li><a href="#">Juhannustanssit ja muu mukava</a></li>
+	</ul>
 	</div>
 
-	<table class="table">
+	<h3>Keskustelut</h3>
+
+	<table class="table" id="threads">
 	<tr>
-	<th>Otsikko</th><th>Nimi</th><th>Aika</th>
+	<th>Otsikko</th><th>Nimi</th><th>Aika</th><th></th>
 	</tr>
 	<tr>
-	<td>Kevätjuhla</td><td>Pertti</td><td>12.4.17 12:32</td>
+	<td>Kevätjuhla</td><td>Pertti</td><td>12.4.17 12:32</td><td><a href="#">Näytä lukeneet</a></td>
 	</tr>
 	<tr>
-	<td>Hirvipeijjaisten jatkot</td><td>Alma</td><td>11.4.17 12:12</td>
+	<td>Hirvipeijjaisten jatkot</td><td>Alma</td><td>11.4.17 12:12</td><td><a href="#">Näytä lukeneet</a></td>
 	</tr>
 	</table>
 

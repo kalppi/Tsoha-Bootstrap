@@ -1,17 +1,17 @@
 <?php
 
 $routes->get('/', function() {
-	HelloWorldController::index();
+	MainController::index();
 });
 
 $routes->get('/liity', function() {
-	HelloWorldController::join();
+	MainController::join();
 });
 
 $routes->get('/uusi-viesti', function() {
-	HelloWorldController::newMessage();
+	MainController::newMessage();
 });
 
 $routes->get('/ketju', function() {
-	HelloWorldController::thread();
+	MainController::thread();
 });

@@ -1,6 +1,6 @@
 <?php
 
-  class DatabaseConfig{
+  class DatabaseConfig {
 
     // Valitse käyttämäsi tietokantapalvelin - PostgreSQL (psql) tai MySQL (mysql)
     private static $use_database = 'psql';

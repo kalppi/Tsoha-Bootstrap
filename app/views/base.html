@@ -40,12 +40,23 @@
           <ul class="nav navbar-nav">
             <!-- Navigaation linkit -->
             <li><a href="{{base_path}}">Etusivu</a></li>
+            <li><a href="{{base_path}}">Jäsenet</a></li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> pera</a></li>
+            <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
           </ul>
         </div>
+
+
       </div>
     </nav>
 
     <div id="main-container">
+      <div class="page-header">
+        <h1>Keskustelufoorumi</h1>
+      </div>
       <!-- Dynaaminen sisältö tulee tähän -->
       {% block content %}{% endblock %}
     </div>

@@ -34,3 +34,34 @@
 .message .info .time {
 	float: right;
 }
+
+#categories {
+	margin-left: 20px;
+	margin-bottom: 30px;
+}
+
+#categories ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+#categories ul li {
+	display: inline-block;
+	background: #eee;
+	border: 1px solid #ccc;
+	padding: 3px 6px;
+	border-radius: 5px;
+}
+
+#categories ul li.selected {
+	background: #fee;
+}
+
+#threads {
+	margin-left: 20px;
+}
+
+#threads tr td:last-child {
+	max-width: 100px;
+	text-align: right;
+}
