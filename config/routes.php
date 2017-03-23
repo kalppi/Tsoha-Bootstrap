@@ -7,3 +7,7 @@ $routes->get('/', function() {
 $routes->get('/liity', function() {
 	HelloWorldController::join();
 });
+
+$routes->get('/uusi-viesti', function() {
+	HelloWorldController::newMessage();
+});

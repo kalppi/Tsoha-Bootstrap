@@ -1,1 +1,34 @@
--- Lisää CREATE TABLE lauseet tähän tiedostoon
+CREATE TABLE forum_user (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(50) UNIQUE,
+	hash VARCHAR(255),
+	email VARCHAR(100),
+	admin BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE forum_category (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE forum_thread (
+	id SERIAL PRIMARY KEY,
+	category_id INTEGER REFERENCES forum_category (id)
+);
+
+CREATE TABLE forum_message (
+	id SERIAL PRIMARY KEY,
+	thread_id INTEGER REFERENCES forum_thread (id),
+	parent_id INTEGER REFERENCES forum_message (id) DEFAULT NULL,
+	user_id INTEGER REFERENCES forum_user (id),
+	sent TIMESTAMP DEFAULT NOW(),
+	message TEXT
+);
+
+CREATE TABLE forum_thread_read (
+	id SERIAL PRIMARY KEY,
+	thread_id INTEGER REFERENCES forum_thread (id),
+	user_id INTEGER REFERENCES forum_user (id),
+	last_message_id INTEGER REFERENCES forum_message (id),
+	UNIQUE (thread_id, user_id)
+);

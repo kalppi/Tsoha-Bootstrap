@@ -14,3 +14,4 @@
 
 * [Etusivu](http://jarnoluu.users.cs.helsinki.fi/tsoha/)
 * [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/liity)
+* [Uusi viesti](http://jarnoluu.users.cs.helsinki.fi/tsoha/uusi-viesti)

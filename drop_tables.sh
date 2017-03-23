@@ -4,7 +4,7 @@ source config/environment.sh
 
 echo "Poistetaan tietokantataulut..."
 
-ssh $USERNAME@users.cs.helsinki.fi "
+ssh $USERNAME@$SERVER -p $PORT "
 cd htdocs/$PROJECT_FOLDER/sql
 psql < drop_tables.sql
 exit"
