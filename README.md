@@ -8,3 +8,9 @@
 ## Työn aihe
 
 [keskustelufoorumi](http://advancedkittenry.github.io/suunnittelu_ja_tyoymparisto/aiheet/Keskustelufoorumi.html) 
+
+
+## Sivut
+
+* [Etusivu](http://jarnoluu.users.cs.helsinki.fi/tsoha/)
+* [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/liity)

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="page-header">
+		<h1>Hae jäseneksi keskusteluun</h1>
+	</div>
+
+	<form>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label>Nimi</label>
+					<input class="form-control" value="" type="text">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label>Sähköposti</label>
+					<input class="form-control" value="" type="email">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<label>Lisätietoja</label>
+					<textarea class="form-control"></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Lähetä</button>
+				</div>
+			</div>
+		</div>
+	</form>
+
+{% endblock %}
