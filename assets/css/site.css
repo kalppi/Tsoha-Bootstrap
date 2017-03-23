@@ -1,10 +1,36 @@
-#main-container{
+#main-container {
   max-width: 1200px;
   padding: 10px 25px;
   margin: 0px auto;
 }
 
-.navbar .container-fluid{
+.navbar .container-fluid {
   max-width: 1200px;
   margin: 0px auto;
+}
+
+.message {
+	border: 1px solid #ccc;
+	padding: 10px;
+	margin-bottom: 20px;
+}
+
+.message.level-2 {
+	margin-left: 30px;
+}
+
+.message.level-3 {
+	margin-left: 60px;
+}
+
+.message .info {
+	margin-bottom: 5px;
+}
+
+.message .info .name {
+	font-weight: bold;
+}
+
+.message .info .time {
+	float: right;
 }

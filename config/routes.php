@@ -11,3 +11,7 @@ $routes->get('/liity', function() {
 $routes->get('/uusi-viesti', function() {
 	HelloWorldController::newMessage();
 });
+
+$routes->get('/ketju', function() {
+	HelloWorldController::thread();
+});
