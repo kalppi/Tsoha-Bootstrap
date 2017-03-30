@@ -7,6 +7,24 @@ class User extends BaseModel {
 		parent::__construct($attributes);
 	}
 
+	public function save() {
+		$q = DB::connection()->prepare(
+			'INSERT INTO forum_user (name, hash, email, accepted, admin) VALUES (:name, :hash, :email, :accepted, :admin) RETURNING id'
+		);
+
+		$q->execute(array(
+			'name' => $this->name,
+			'hash' => $this->hash,
+			'email' => $this->email,
+			'accepted' => $this->accepted,
+			'admin' => $this->admin
+		));
+
+		$row = $q->fetch();
+
+		$this->id = $row['id'];
+	}
+
 	public static function all() {
 		$q = DB::connection()->prepare('SELECT * FROM forum_user');
 		$q->execute();

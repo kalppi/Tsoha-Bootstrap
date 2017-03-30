@@ -2,7 +2,11 @@
 
 class UserController extends BaseController {
 	public static function index() {
+		self::checkLoggedIn();
 
+		$user = parent::getLoggedInUser();
+
+		self::user($user->id);
 	}
 
 	public static function join() {
@@ -13,10 +17,14 @@ class UserController extends BaseController {
 			$user = new User(array(
 				'name' => $_POST['name'],
 				'email' => $_POST['email'],
-				'hash' => $hash
+				'hash' => $hash,
+				'accepted' => false,
+				'admin' => false
 			));
 
 			$user->save();
+
+			View::make('joined.html');
 		} else {
 			View::make('join.html');
 		}
@@ -39,8 +47,7 @@ class UserController extends BaseController {
 
 				Redirect::to('/');
 			} else {
-				echo 3;
-				#Redirect::to('/');
+				Redirect::to('/');
 			}
 		} else {
 			View::make('login.html');
@@ -48,7 +55,19 @@ class UserController extends BaseController {
 	}
 
 	public static function all() {
+		self::checkLoggedIn();
+
 		View::make('users.html', array('users' => User::all()));
+	}
+
+	public static function user($id) {
+		self::checkLoggedIn();
+
+		$user = User::find($id);
+
+		if($user) {
+			View::make('user.html', array('view_user' => $user));
+		}
 	}
 }
 

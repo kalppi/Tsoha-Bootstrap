@@ -19,7 +19,7 @@ class BaseController {
 
 	public static function checkLoggedIn() {
 		if(self::getLoggedInUser() == null) {
-			Redirect::to('/kirjaudu');
+			View::make('login.html');
 		}
 	}
 

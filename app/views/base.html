@@ -46,7 +46,7 @@
 
           <ul class="nav navbar-nav navbar-right">
             {% if user %}
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
+            <li><a href="{{base_path}}/kayttaja/{{user.id}}"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
             <li><a href="{{base_path}}/ulos"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
             {% endif %}
           </ul>

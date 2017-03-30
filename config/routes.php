@@ -35,3 +35,11 @@ $routes->get('/ulos', function() {
 $routes->post('/kirjaudu', function() {
 	UserController::login();
 });
+
+$routes->get('/kayttaja', function() {
+	UserController::index();
+});
+
+$routes->get('/kayttaja/:id', function($id) {
+	UserController::user($id);
+});
