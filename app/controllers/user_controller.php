@@ -9,10 +9,22 @@ class UserController extends BaseController {
 		self::user($user->id);
 	}
 
+	private static function generateSalt() {
+		return '$2y$12$' . bin2hex(openssl_random_pseudo_bytes(32));
+	}
+
+	private static function hashPassword($pw) {
+		return crypt($pw, self::generateSalt());
+	}
+
+	private static function verifyPassword($pw, $hash) {
+		 return $hash === crypt($pw, $hash);
+	}
+
 	public static function join() {
 		if(isset($_POST['password'])) {
 			$pw = $_POST['password'];
-			$hash = password_hash($pw, PASSWORD_DEFAULT);
+			$hash = self::hashPassword($pw);
 
 			$user = new User(array(
 				'name' => $_POST['name'],
@@ -39,7 +51,7 @@ class UserController extends BaseController {
 
 			if(!$user) {
 				Redirect::to('/kirjaudu');
-			} else if(password_verify($pw, $user->hash)) {
+			} else if(self::verifyPassword($pw, $user->hash)) {
 				$loginToken = LoginToken::generate($user);
 
 				//setcookie('login', $loginToken->token, 0, '/');
