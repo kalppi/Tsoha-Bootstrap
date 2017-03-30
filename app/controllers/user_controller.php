@@ -5,12 +5,10 @@ class UserController extends BaseController {
 
 	}
 
-	public static function create() {
+	public static function join() {
 		if(isset($_POST['password'])) {
 			$pw = $_POST['password'];
 			$hash = password_hash($pw, PASSWORD_DEFAULT);
-
-			die($hash);
 
 			$user = new User(array(
 				'name' => $_POST['name'],
@@ -19,6 +17,8 @@ class UserController extends BaseController {
 			));
 
 			$user->save();
+		} else {
+			View::make('join.html');
 		}
 	}
 

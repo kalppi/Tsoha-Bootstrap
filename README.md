@@ -13,9 +13,10 @@
 ## Sivut
 
 * [Etusivu](http://jarnoluu.users.cs.helsinki.fi/tsoha/)
-* [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/liity)
+* [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/kayttaja/uusi)
 * [Uusi viesti](http://jarnoluu.users.cs.helsinki.fi/tsoha/uusi-viesti)
 * [Ketju](http://jarnoluu.users.cs.helsinki.fi/tsoha/ketju)
+* [Kaikki käyttäjät](http://jarnoluu.users.cs.helsinki.fi/tsoha/kayttaja/kaikki)
 
 ## Testikäyttäjät
 

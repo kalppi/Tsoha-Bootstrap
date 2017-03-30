@@ -4,10 +4,6 @@ $routes->get('/', function() {
 	ForumController::index();
 });
 
-$routes->get('/liity', function() {
-	MainController::join();
-});
-
 $routes->get('/uusi-viesti', function() {
 	MainController::newMessage();
 });
@@ -21,7 +17,11 @@ $routes->get('/kayttaja/kaikki', function() {
 });
 
 $routes->get('/kayttaja/uusi', function() {
-	UserController::create();
+	UserController::join();
+});
+
+$routes->post('/kayttaja/uusi', function() {
+	UserController::join();
 });
 
 $routes->get('/kirjaudu', function() {
