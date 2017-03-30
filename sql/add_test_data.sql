@@ -1,5 +1,5 @@
-INSERT INTO forum_user (name, hash, email, accepted) VALUES ('pera', '$2y$12$ef390ec5dc68fcb861e00ODXmJK1nSWBa7BqRux926wDgbLtb6usK', 'pera@luukku.com', TRUE);
-INSERT INTO forum_user (name, hash, email, accepted, admin) VALUES ('pirjo', '$2y$12$a275be13642f1bee4d2fcuvkVVRhKTbjgga6dqPIrGPHnwLF8AAC6', 'pirjo@gmail.com', TRUE, TRUE);
+INSERT INTO forum_user (name, hash, email, accepted) VALUES ('pera', '$2a$12$b95d8162803b88d3a857cenSizJpkTiLoYYPXrYlcs/CbC2LHGqZS', 'pera@luukku.com', TRUE);
+INSERT INTO forum_user (name, hash, email, accepted, admin) VALUES ('pirjo', '$2a$12$d2a5585d1aa87b20ced77OX2ICyK14WgEPJYJfl3lVD8IqWuk9yjO', 'pirjo@gmail.com', TRUE, TRUE);
 
 INSERT INTO forum_category (name) VALUES ('Yleinen'), ('Vapaa-aika');
 

@@ -10,7 +10,7 @@ class UserController extends BaseController {
 	}
 
 	private static function generateSalt() {
-		return '$2y$12$' . bin2hex(openssl_random_pseudo_bytes(32));
+		return '$2a$12$' . bin2hex(openssl_random_pseudo_bytes(32));
 	}
 
 	private static function hashPassword($pw) {
@@ -18,7 +18,7 @@ class UserController extends BaseController {
 	}
 
 	private static function verifyPassword($pw, $hash) {
-		 return $hash === crypt($pw, $hash);
+		return $hash === crypt($pw, $hash);
 	}
 
 	public static function join() {
