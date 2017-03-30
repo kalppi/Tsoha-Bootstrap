@@ -3,6 +3,7 @@ CREATE TABLE forum_user (
 	name VARCHAR(50) UNIQUE,
 	hash VARCHAR(255),
 	email VARCHAR(100),
+	accepted BOOLEAN DEFAULT FALSE,
 	admin BOOLEAN DEFAULT FALSE
 );
 
@@ -31,4 +32,11 @@ CREATE TABLE forum_thread_read (
 	user_id INTEGER REFERENCES forum_user (id),
 	last_message_id INTEGER REFERENCES forum_message (id),
 	UNIQUE (thread_id, user_id)
+);
+
+CREATE TABLE forum_login_token (
+	id SERIAL PRIMARY KEY,
+	token VARCHAR(64),
+	user_id INTEGER REFERENCES forum_user (id),
+	last_active TIMESTAMP DEFAULT NOW()
 );

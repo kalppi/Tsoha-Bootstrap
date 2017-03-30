@@ -1,7 +1,7 @@
 <?php
 
 $routes->get('/', function() {
-	MainController::index();
+	ForumController::index();
 });
 
 $routes->get('/liity', function() {
@@ -14,4 +14,24 @@ $routes->get('/uusi-viesti', function() {
 
 $routes->get('/ketju', function() {
 	MainController::thread();
+});
+
+$routes->get('/kayttaja/kaikki', function() {
+	UserController::all();
+});
+
+$routes->get('/kayttaja/uusi', function() {
+	UserController::create();
+});
+
+$routes->get('/kirjaudu', function() {
+	UserController::login();
+});
+
+$routes->get('/ulos', function() {
+	UserController::logout();
+});
+
+$routes->post('/kirjaudu', function() {
+	UserController::login();
 });

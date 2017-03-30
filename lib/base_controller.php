@@ -1,15 +1,36 @@
 <?php
 
-  class BaseController{
+class BaseController {
+	private static $loggedInUser = null;
 
-    public static function get_user_logged_in(){
-      // Toteuta kirjautuneen käyttäjän haku tähän
-      return null;
-    }
+	public static function getLoggedInUser() {
+		if(self::$loggedInUser == null && !empty($_SESSION['token'])) {
+			$loginToken = LoginToken::find($_SESSION['token']);
 
-    public static function check_logged_in(){
-      // Toteuta kirjautumisen tarkistus tähän.
-      // Jos käyttäjä ei ole kirjautunut sisään, ohjaa hänet toiselle sivulle (esim. kirjautumissivulle).
-    }
+			if($loginToken) {
+				self::$loggedInUser = User::find($loginToken->user_id);
+				
+				$loginToken->updateActive();
+			}
+		}
 
-  }
+		return self::$loggedInUser;
+	}
+
+	public static function checkLoggedIn() {
+		if(self::getLoggedInUser() == null) {
+			Redirect::to('/kirjaudu');
+		}
+	}
+
+	public static function logout() {
+		if(isset($_SESSION['token'])) {
+			LoginToken::delete($_SESSION['token']);
+			unset($_SESSION['token']);
+
+			self::$loggedInUser = null;
+		}
+
+		Redirect::to('/');
+	}
+}

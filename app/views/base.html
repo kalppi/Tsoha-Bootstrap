@@ -38,14 +38,17 @@
 
         <div class="collapse navbar-collapse" id="navigation">
           <ul class="nav navbar-nav">
-            <!-- Navigaation linkit -->
+            {% if user %}
             <li><a href="{{base_path}}">Etusivu</a></li>
             <li><a href="{{base_path}}">Jäsenet</a></li>
+            {% endif %}
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-user"></span> pera</a></li>
-            <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
+            {% if user %}
+            <li><a href="#"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
+            <li><a href="{{base_path}}/ulos"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
+            {% endif %}
           </ul>
         </div>
 

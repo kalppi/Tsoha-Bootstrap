@@ -121,7 +121,10 @@ function prettyprint($data) {
     return;
   }
   echo '<table class="table table-striped table-bordered">';
-  echo '<tr>',implode('', array_map(function($t) {return "<th>$t</th>";}, array_keys((array)array_shift(array_values($data))))),'</tr>';
+
+  $values = array_values($data);
+
+  echo '<tr>',implode('', array_map(function($t) {return "<th>$t</th>";}, array_keys((array)array_shift($values)))),'</tr>';
   foreach($data as $datum) {
     echo '<tr>',implode('', array_map(function($t) {return "<td>$t</td>";}, (array)$datum)),'</tr>';
   }

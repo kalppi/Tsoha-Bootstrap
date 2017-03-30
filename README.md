@@ -16,3 +16,10 @@
 * [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/liity)
 * [Uusi viesti](http://jarnoluu.users.cs.helsinki.fi/tsoha/uusi-viesti)
 * [Ketju](http://jarnoluu.users.cs.helsinki.fi/tsoha/ketju)
+
+## Testikäyttäjät
+
+* pera@luukku.com
+* pirjo@gmail.com
+
+Molempien salasanana `salasana`.
