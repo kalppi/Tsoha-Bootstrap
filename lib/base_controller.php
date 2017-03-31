@@ -4,13 +4,23 @@ class BaseController {
 	private static $loggedInUser = null;
 
 	public static function getLoggedInUser() {
-		if(self::$loggedInUser == null && !empty($_SESSION['token'])) {
-			$loginToken = LoginToken::find($_SESSION['token']);
+		if(self::$loggedInUser == null) {
+			$token = null;
 
-			if($loginToken) {
-				self::$loggedInUser = User::find($loginToken->user_id);
-				
-				$loginToken->updateActive();
+			if(!empty($_SESSION['token'])) {
+				$token = $_SESSION['token'];
+			} else if(!empty($_COOKIE['token'])) {
+				$token = $_COOKIE['token'];
+			}
+
+			if($token) {
+				$loginToken = LoginToken::find($token);
+
+				if($loginToken) {
+					self::$loggedInUser = User::find($loginToken->user_id);
+					
+					$loginToken->updateActive();
+				}
 			}
 		}
 
@@ -27,6 +37,7 @@ class BaseController {
 		if(isset($_SESSION['token'])) {
 			LoginToken::delete($_SESSION['token']);
 			unset($_SESSION['token']);
+			unset($_COOKIE['token']);
 
 			self::$loggedInUser = null;
 		}

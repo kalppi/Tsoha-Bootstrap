@@ -43,23 +43,31 @@ class UserController extends BaseController {
 	}
 
 	public static function login() {
-		if(isset($_POST['email'])) {
+		if(isset($_POST['email']) && isset($_POST['password'])) {
 			$email = $_POST['email'];
 			$pw = $_POST['password'];
+			$remember = isset($_POST['remember']) ? boolval($_POST['remember']) : false;
 
 			$user = User::findBy('email', $email);
 
+			$err = function() {
+				Redirect::to('/kirjaudu', array('error' => 'Virheellinen käyttäjätunnus tai salasana'));
+			};
+
 			if(!$user) {
-				Redirect::to('/kirjaudu');
+				$err();
 			} else if(self::verifyPassword($pw, $user->hash)) {
 				$loginToken = LoginToken::generate($user);
 
-				//setcookie('login', $loginToken->token, 0, '/');
 				$_SESSION['token'] = $loginToken->token;
+				
+				if($remember) {
+					setcookie('token', $loginToken->token, time() + 60 * 60 * 24 * 30, '/');
+				}
 
 				Redirect::to('/');
 			} else {
-				Redirect::to('/');
+				$err();
 			}
 		} else {
 			View::make('login.html');
