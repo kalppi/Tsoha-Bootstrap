@@ -1,7 +1,7 @@
 <?php
 
 class Thread extends BaseModel {
-	public $id, $category_id, $title, $message_count, $first_message, $last_message;
+	public $id, $category_id, $title, $message_count, $first_message, $last_message, $read_percent;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -99,7 +99,8 @@ class Thread extends BaseModel {
 				'title' => $row['t_title'],
 				'message_count' => $row['t_message_count'],
 				'first_message' => $firstMessage,
-				'last_message' => $lastMessage
+				'last_message' => $lastMessage,
+				'read_percent' => rand(0, 100)
 			));
 		}
 

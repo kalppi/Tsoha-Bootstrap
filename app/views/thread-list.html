@@ -15,16 +15,16 @@
 
 	<table class="table" id="threads">
 	<tr>
-	<th>Otsikko</th><th>Aloitus</th><th>Viimeisin</th><th>Viestejä</th><th></th>
+	<th>Otsikko</th><th>Aloitus</th><th>Viimeisin</th><th>Viestejä</th><th>Luettu</th>
 	</tr>
 
 	{% for thread in threads %}
 	<tr>
 	<td>{{thread.title}}</td>
-	<td><div>{{thread.first_message.user.name}}</div><small>{{thread.first_message.sent|date("Y-m-d H:i:s")}}</small></td>
-	<td><div>{{thread.last_message.user.name}}</div><small>{{thread.last_message.sent|date("Y-m-d H:i:s")}}</small></td>
+	<td><div><a href="{{base_path}}/kayttaja/{{thread.first_message.user.id}}">{{thread.first_message.user.name}}</a></div><small>{{thread.first_message.sent|date("d.m. Y H:i:s")}}</small></td>
+	<td><div><a href="{{base_path}}/kayttaja/{{thread.last_message.user.id}}">{{thread.last_message.user.name}}</a></div><small>{{thread.last_message.sent|date("d.m. Y H:i:s")}}</small></td>
 	<td>{{thread.message_count}}</td>
-	<td><a href="#">Näytä lukeneet</a></td>
+	<td><a href="#"><canvas width="40" height="40" data-percent="{{thread.read_percent}}"></canvas></a></td>
 	</tr>
 	{% endfor %}
 

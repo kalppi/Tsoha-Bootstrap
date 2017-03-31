@@ -62,6 +62,5 @@
 }
 
 #threads tr td:last-child {
-	max-width: 100px;
-	text-align: right;
+	amax-width: 100px;
 }
