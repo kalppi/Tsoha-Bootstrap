@@ -1,7 +1,11 @@
 <?php
 
 $routes->get('/', function() {
-	ForumController::index();
+	CategoryController::index();
+});
+
+$routes->get('/alue/:id', function($id) {
+	CategoryController::show($id);
 });
 
 $routes->get('/uusi-viesti', function() {

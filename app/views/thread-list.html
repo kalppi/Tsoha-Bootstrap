@@ -4,9 +4,9 @@
 	<h3>Alueet</h3>
 	<div id="categories">
 	<ul>
-	<li class="selected"><a href="#">Kaikki</a></li>
+	<li class="selected"><a href="{{base_path}}">Kaikki</a></li>
 	{% for cat in cats %}
-		<li><a href="#">{{cat.name}}</a></li>	
+		<li><a href="{{base_path}}/alue/{{cat.id}}">{{cat.name}}</a></li>	
 	{% endfor %}
 	</ul>
 	</div>
@@ -15,16 +15,17 @@
 
 	<table class="table" id="threads">
 	<tr>
-	<th>Otsikko</th><th>Aloitus</th><th>Viimeisin</th><th>Viestejä</th><th>Luettu</th>
+		<th>Alue</th><th>Aihe</th><th>Aloitus</th><th>Viimeisin</th><th>Viestejä</th><th>Luettu</th>
 	</tr>
 
 	{% for thread in threads %}
 	<tr>
-	<td>{{thread.title}}</td>
-	<td><div><a href="{{base_path}}/kayttaja/{{thread.first_message.user.id}}">{{thread.first_message.user.name}}</a></div><small>{{thread.first_message.sent|date("d.m. Y H:i:s")}}</small></td>
-	<td><div><a href="{{base_path}}/kayttaja/{{thread.last_message.user.id}}">{{thread.last_message.user.name}}</a></div><small>{{thread.last_message.sent|date("d.m. Y H:i:s")}}</small></td>
-	<td>{{thread.message_count}}</td>
-	<td><a href="#"><canvas width="40" height="40" data-percent="{{thread.read_percent}}"></canvas></a></td>
+		<td class="category"><a href="{{base_path}}/alue/{{thread.category.id}}">{{thread.category.name}}</a></td>
+		<td class="title"><a href="{{base_path}}/ketju/{{thread.id}}">{{thread.title}}</a></td>
+		<td class="first"><div><a href="{{base_path}}/kayttaja/{{thread.first_message.user.id}}">{{thread.first_message.user.name}}</a></div><small>{{thread.first_message.sent|date("d.m. Y H:i:s")}}</small></td>
+		<td class="last"><div><a href="{{base_path}}/kayttaja/{{thread.last_message.user.id}}">{{thread.last_message.user.name}}</a></div><small>{{thread.last_message.sent|date("d.m. Y H:i:s")}}</small></td>
+		<td class="count">{{thread.message_count}}</td>
+		<td class="percent"><a href="#" data-percent="{{thread.read_percent}}">{{thread.read_percent * 100 | round(0, 'floor')}}%</a></td>
 	</tr>
 	{% endfor %}
 

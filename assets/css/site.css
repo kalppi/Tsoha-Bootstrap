@@ -49,12 +49,16 @@
 	display: inline-block;
 	background: #eee;
 	border: 1px solid #ccc;
-	padding: 3px 6px;
-	border-radius: 5px;
+	padding: 6px 8px;
 }
 
 #categories ul li.selected {
-	background: #fee;
+	background: #666;
+}
+
+#categories ul li.selected a {
+	color: white;
+	border-color: #333;
 }
 
 #threads {
@@ -63,4 +67,20 @@
 
 #threads tr td:last-child {
 	amax-width: 100px;
+}
+
+#threads .category {
+	width: 150px;
+}
+
+#threads .first, #threads .last {
+	width: 200px;
+}
+
+#threads .count {
+	width: 100px;
+}
+
+#threads .percent {
+	width: 100px;
 }
