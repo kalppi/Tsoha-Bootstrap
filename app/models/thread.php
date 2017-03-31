@@ -22,6 +22,57 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
+	private static function createThreads($rows, $reads) {
+		$threads = array();
+
+		foreach($rows as $row) {
+			$firstUser = new User(array(
+				'id' => $row['u_first_id'],
+				'name' => $row['u_first_name'],
+				'admin' => $row['u_first_admin']
+			));
+
+			$firstMessage = new Message(array(
+				'id' => $row['m_first_id'],
+				'thread_id' => $row['t_id'],
+				'parent_id' => null,
+				'sent' => $row['m_first_sent'],
+				'message' => $row['m_first_message'],
+				'user' => $firstUser
+			));
+
+			$lastUser = new User(array(
+				'id' => $row['u_last_id'],
+				'name' => $row['u_last_name'],
+				'admin' => $row['u_last_admin']
+			));
+
+			$lastMessage = new Message(array(
+				'id' => $row['m_last_id'],
+				'thread_id' => $row['t_id'],
+				'parent_id' => null,
+				'sent' => $row['m_last_sent'],
+				'message' => $row['m_last_message'],
+				'user' => $lastUser
+			));
+
+			$threads[] = new Thread(array(
+				'id' => $row['t_id'],
+				'category' => new Category(array(
+					'id' => $row['t_category_id'],
+					'name' => $row['c_name']
+				)),
+				'title' => $row['t_title'],
+				'message_count' => $row['t_message_count'],
+				'first_message' => $firstMessage,
+				'last_message' => $lastMessage,
+				'read_percent' => isset($reads[$row['t_id']]) ? $reads[$row['t_id']] : 0
+			));
+		}
+
+		return $threads;
+	}
+
 	public static function all() {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
 
@@ -74,54 +125,8 @@ class Thread extends BaseModel {
 		));
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-		$threads = array();
-
-		foreach($rows as $row) {
-			$firstUser = new User(array(
-				'id' => $row['u_first_id'],
-				'name' => $row['u_first_name'],
-				'admin' => $row['u_first_admin']
-			));
-
-			$firstMessage = new Message(array(
-				'id' => $row['m_first_id'],
-				'thread_id' => $row['t_id'],
-				'parent_id' => null,
-				'sent' => $row['m_first_sent'],
-				'message' => $row['m_first_message'],
-				'user' => $firstUser
-			));
-
-			$lastUser = new User(array(
-				'id' => $row['u_last_id'],
-				'name' => $row['u_last_name'],
-				'admin' => $row['u_last_admin']
-			));
-
-			$lastMessage = new Message(array(
-				'id' => $row['m_last_id'],
-				'thread_id' => $row['t_id'],
-				'parent_id' => null,
-				'sent' => $row['m_last_sent'],
-				'message' => $row['m_last_message'],
-				'user' => $lastUser
-			));
-
-			$threads[] = new Thread(array(
-				'id' => $row['t_id'],
-				'category' => new Category(array(
-					'id' => $row['t_category_id'],
-					'name' => $row['c_name']
-				)),
-				'title' => $row['t_title'],
-				'message_count' => $row['t_message_count'],
-				'first_message' => $firstMessage,
-				'last_message' => $lastMessage,
-				'read_percent' => $reads[$row['t_id']]
-			));
-		}
-
-		return $threads;
+		
+		return self::createThreads($rows, $reads);
 	}
 
 	public static function allInCategory($cats) {
@@ -176,54 +181,8 @@ class Thread extends BaseModel {
 		));
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-		$threads = array();
-
-		foreach($rows as $row) {
-			$firstUser = new User(array(
-				'id' => $row['u_first_id'],
-				'name' => $row['u_first_name'],
-				'admin' => $row['u_first_admin']
-			));
-
-			$firstMessage = new Message(array(
-				'id' => $row['m_first_id'],
-				'thread_id' => $row['t_id'],
-				'parent_id' => null,
-				'sent' => $row['m_first_sent'],
-				'message' => $row['m_first_message'],
-				'user' => $firstUser
-			));
-
-			$lastUser = new User(array(
-				'id' => $row['u_last_id'],
-				'name' => $row['u_last_name'],
-				'admin' => $row['u_last_admin']
-			));
-
-			$lastMessage = new Message(array(
-				'id' => $row['m_last_id'],
-				'thread_id' => $row['t_id'],
-				'parent_id' => null,
-				'sent' => $row['m_last_sent'],
-				'message' => $row['m_last_message'],
-				'user' => $lastUser
-			));
-
-			$threads[] = new Thread(array(
-				'id' => $row['t_id'],
-				'category' => new Category(array(
-					'id' => $row['t_category_id'],
-					'name' => $row['c_name']
-				)),
-				'title' => $row['t_title'],
-				'message_count' => $row['t_message_count'],
-				'first_message' => $firstMessage,
-				'last_message' => $lastMessage,
-				'read_percent' => $reads[$row['t_id']]
-			));
-		}
-
-		return $threads;
+		
+		return self::createThreads($rows, $reads);
 	}
 }
 

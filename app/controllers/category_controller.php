@@ -6,6 +6,7 @@ class CategoryController extends BaseController {
 
 		View::make('thread-list.html', array(
 			'cats' => Category::all(),
+			'cat_selected' => 'all',
 			'threads' => Thread::all()
 		));
 	}
@@ -15,6 +16,7 @@ class CategoryController extends BaseController {
 
 		View::make('thread-list.html', array(
 			'cats' => Category::all(),
+			'cat_selected' => $id,
 			'threads' => Thread::allInCategory(array($id))
 		));
 	}

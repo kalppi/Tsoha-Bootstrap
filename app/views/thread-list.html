@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h3>Alueet</h3>
-	<div id="categories">
-	<ul>
-	<li class="selected"><a href="{{base_path}}">Kaikki</a></li>
-	{% for cat in cats %}
-		<li><a href="{{base_path}}/alue/{{cat.id}}">{{cat.name}}</a></li>	
-	{% endfor %}
-	</ul>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Alueet</h4>
+
+				<div id="categories">
+					<ul>
+						<li class="{% if cat_selected == "all" %}selected{% endif %}"><a href="{{base_path}}">Kaikki</a></li>
+						{% for cat in cats %}
+							<li class="{% if cat_selected == cat.id %}selected{% endif %}"><a href="{{base_path}}/alue/{{cat.id}}">{{cat.name}}</a></li>	
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<h4>Järjestys</h4>
+			</div>
+			<div class="col-md-4">
+
+			</div>
+		</div>
 	</div>
 
 	<h3>Keskustelut</h3>
