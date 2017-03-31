@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h3>Alueet</h3>
+	<div id="categories">
+	<ul>
+	<li class="selected"><a href="#">Kaikki</a></li>
+	{% for cat in cats %}
+		<li><a href="#">{{cat.name}}</a></li>	
+	{% endfor %}
+	</ul>
+	</div>
+
+	<h3>Keskustelut</h3>
+
+	<table class="table" id="threads">
+	<tr>
+	<th>Otsikko</th><th>Aloitus</th><th>Viimeisin</th><th>Viestejä</th><th></th>
+	</tr>
+
+	{% for thread in threads %}
+	<tr>
+	<td>{{thread.title}}</td>
+	<td><div>{{thread.first_message.user.name}}</div><small>{{thread.first_message.sent|date("Y-m-d H:i:s")}}</small></td>
+	<td><div>{{thread.last_message.user.name}}</div><small>{{thread.last_message.sent|date("Y-m-d H:i:s")}}</small></td>
+	<td>{{thread.message_count}}</td>
+	<td><a href="#">Näytä lukeneet</a></td>
+	</tr>
+	{% endfor %}
+
+	</table>
+
+{% endblock %}

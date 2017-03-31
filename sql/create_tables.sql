@@ -4,7 +4,8 @@ CREATE TABLE forum_user (
 	hash VARCHAR(255),
 	email VARCHAR(100),
 	accepted BOOLEAN DEFAULT FALSE,
-	admin BOOLEAN DEFAULT FALSE
+	admin BOOLEAN DEFAULT FALSE,
+	registered TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE forum_category (
@@ -14,7 +15,8 @@ CREATE TABLE forum_category (
 
 CREATE TABLE forum_thread (
 	id SERIAL PRIMARY KEY,
-	category_id INTEGER REFERENCES forum_category (id)
+	category_id INTEGER REFERENCES forum_category (id),
+	title VARCHAR(200)
 );
 
 CREATE TABLE forum_message (
@@ -22,7 +24,7 @@ CREATE TABLE forum_message (
 	thread_id INTEGER REFERENCES forum_thread (id),
 	parent_id INTEGER REFERENCES forum_message (id) DEFAULT NULL,
 	user_id INTEGER REFERENCES forum_user (id),
-	sent TIMESTAMP DEFAULT NOW(),
+	sent TIMESTAMPTZ DEFAULT NOW(),
 	message TEXT
 );
 
@@ -38,5 +40,5 @@ CREATE TABLE forum_login_token (
 	id SERIAL PRIMARY KEY,
 	token VARCHAR(64),
 	user_id INTEGER REFERENCES forum_user (id),
-	last_active TIMESTAMP DEFAULT NOW()
+	last_active TIMESTAMPTZ DEFAULT NOW()
 );

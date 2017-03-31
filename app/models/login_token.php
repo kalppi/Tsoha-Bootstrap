@@ -3,7 +3,7 @@
 class LoginToken extends BaseModel {
 	public $id, $token, $user_id, $last_active;
 
-	public function __construct($attributes){
+	public function __construct($attributes) {
 		parent::__construct($attributes);
 	}
 
@@ -34,18 +34,13 @@ class LoginToken extends BaseModel {
 		);
 
 		$q->execute(array('token' => $token));
-		$row = $q->fetch();
+		$row = $q->fetch(PDO::FETCH_ASSOC);
 
 		if(!$row) {
 			return null;
 		}
 
-		return new LoginToken(array(
-	    	'id' => $row['id'],
-	    	'token' => $row['token'],
-	    	'user_id' => $row['user_id'],
-	    	'last_active' => $row['last_active']
-	    ));
+		return new LoginToken($row);
 	}
 
 	public static function delete($token) {
