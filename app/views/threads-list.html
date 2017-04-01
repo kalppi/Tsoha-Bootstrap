@@ -4,15 +4,16 @@
 	<div class="container" id="filter-options">
 		<div class="row">
 			<div class="col-md-12">
-				<h4>Alueet</h4>
+				<h5>Alueet</h5>
 
 				<div id="categories">
 					<ul>
 						{{
-							url_format(base_path, 'alue-:alue/jarjesta-:jarjesta/tyyppi-:tyyppi', {
+							url_format(base_path, default, {
 								'alue': cat_selected,
 								'jarjesta': order_selected,
-								'tyyppi': type_selected
+								'tyyppi': type_selected,
+								'aika': time_selected
 							})
 						}}
 
@@ -25,9 +26,26 @@
 				</div>
 			</div>
 		</div>
+
 		<div class="row">
-			<div class="col-md-3">
-				<h4>Järjestys</h4>
+			<div class="col-md-5">
+				<h5>Aloitettu</h5>
+
+				{% set times = {'kaikki': 'Milloin tahansa', 'kuukausi': 'Viimeinen kuukausi', 'viikko': 'Viimeinen viikko', 'päivä': 'Viimeinen päivä'} %}
+
+				<ul>
+					{% for key, time in times %}
+					<li class="{% if time_selected == key %}selected{% endif %}">
+						<a href="{{  url({'aika': key}) }}">{{time}}</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<h5>Järjestys</h5>
 
 				{% set orders = ['Aloitus', 'Viimeisin', 'Viestejä', 'Luettu'] %}
 
@@ -37,23 +55,18 @@
 						<a href="{{  url({'jarjesta': order|lower}) }}">{{order}}</a>
 					</li>
 					{% endfor %}
-				</ul>
 
-				<ul>
-					<li class="{% if type_selected == 'laskeva' %}selected{% endif %}">
+					<li class="descending {% if type_selected == 'laskeva' %}selected{% endif %}">
 						<a href="{{  url({'tyyppi': 'laskeva'}) }}">
 							<span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Laskeva
 						</a>
 					</li>
-					<li class="{% if type_selected == 'nouseva' %}selected{% endif %}">
+					<li class="ascending {% if type_selected == 'nouseva' %}selected{% endif %}">
 						<a href="{{  url({'tyyppi': 'nouseva'}) }}">
 							<span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span> Nouseva
 						</a>
 					</li>
 				</ul>
-			</div>
-			<div class="col-md-9">
-				<h4>Ajalta</h4>
 			</div>
 		</div>
 	</div>

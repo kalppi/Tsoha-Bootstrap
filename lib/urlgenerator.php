@@ -2,19 +2,23 @@
 
 class UrlGenerator {
 	private $default = array();
-	private $format = "";
 
-	public function __construct($default, $format) {
+	public function __construct($default) {
 		$this->default = $default;
-		$this->format = $format;
 	}
 
 	public function generate($changes = array()) {
 		$values = array_merge($this->default, $changes);
 
-		return preg_replace_callback("#:([a-zA-Z]+)#", function($input) use($values) {
-			return $values[$input[1]];
-		}, $this->format);
+		$data = array();
+
+		foreach($changes as $key => $value) {
+			if(!isset($this->default[$key]) || $changes[$key] != $this->default[$key]) {
+				$data[] = $key . "=" . $value;
+			}
+		}
+
+		return implode("&", $data);
 	}
 }
 

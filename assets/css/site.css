@@ -49,8 +49,17 @@ h1 {
 	float: right;
 }
 
+#filter-options .descending {
+	margin-left: 15px;
+}
+
 #filter-options {
 	margin-bottom: 30px;
+}
+
+#filter-options h5 {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 #filter-options ul {
@@ -60,7 +69,6 @@ h1 {
 
 #filter-options ul li {
 	display: inline-block;
-	padding: 3px 4px;
 }
 
 #filter-options ul li a {

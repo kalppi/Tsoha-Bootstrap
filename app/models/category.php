@@ -1,7 +1,7 @@
 <?php
 
 class Category extends BaseModel {
-	public $id, $name;
+	public $id, $name, $thread_count;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -21,9 +21,19 @@ class Category extends BaseModel {
 		$this->id = $row['id'];
 	}
 
+	public static function threadCount() {
+		$q = DB::connection()->prepare(
+			'SELECT COUNT(*) FROM forum_thread'
+		);
+
+		$q->execute();
+
+		return $q->fetchColumn();
+	}
+
 	public static function all() {
 		$q = DB::connection()->prepare(
-			'SELECT * FROM forum_category'
+			'SELECT c.*, COUNT(t.*) AS thread_count FROM forum_category c LEFT JOIN forum_thread t ON t.category_id = c.id GROUP BY c.id ORDER BY c.id'
 		);
 
 		$q->execute();

@@ -4,18 +4,6 @@ $routes->get('/', function() {
 	CategoryController::show();
 });
 
-$routes->get('/alue-:id', function($id) {
-	CategoryController::show($id);
-});
-
-$routes->get('/alue-:id/jarjesta-:order', function($id, $order) {
-	CategoryController::show($id, $order);
-});
-
-$routes->get('/alue-:id/jarjesta-:order/tyyppi-:type', function($id, $order, $type) {
-	CategoryController::show($id, $order, $type);
-});
-
 $routes->get('/uusi-viesti', function() {
 	MainController::newMessage();
 });

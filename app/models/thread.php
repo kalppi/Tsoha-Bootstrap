@@ -22,7 +22,7 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	private static function createThreads($rows, $reads, $order, $ascdesc) {
+	private static function createThreads($rows, $reads, $orderField, $order) {
 		$threads = array();
 
 		foreach($rows as $row) {
@@ -70,8 +70,8 @@ class Thread extends BaseModel {
 			));
 		}
 
-		if($order == 'luettu') {
-			if($ascdesc == 'ASC') {
+		if($orderField == 'luettu') {
+			if($order == 'ASC') {
 				$av = -1;
 				$bv = 1;
 			} else {
@@ -87,19 +87,8 @@ class Thread extends BaseModel {
 		return $threads;
 	}
 
-	public static function all($order, $ascdesc) {
-		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
-
-		$q->execute();
-
-		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-
-		$reads = array();
-		foreach($rows as $row) {
-			$reads[$row['thread_id']] = $row['percent'];
-		}
-
-		switch($order) {
+	private static function generateSql($orderField, $order, $cats = null) {
+		switch($orderField) {
         	case "aloitus":
         		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
         		break;
@@ -113,7 +102,7 @@ class Thread extends BaseModel {
         		$sql = "SELECT DISTINCT ON(t.id)";
         		break;
         	default:
-        		throw new Exception('Unknown order (' . $order . ")");
+        		throw new Exception('Unknown order field (' . $order . ")");
     	}
         
 
@@ -141,26 +130,45 @@ class Thread extends BaseModel {
         INNER JOIN forum_message m2 ON t.id = m2.thread_id
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
-        INNER JOIN forum_category c ON c.id = t.category_id
-        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
+        INNER JOIN forum_category c ON c.id = t.category_id";
+
+        if(is_array($cats)) {
+        	$sql .= " WHERE c.id IN (" . implode(',', $cats) . ")";
+        }
+
+        $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
         
-        switch($order) {
+        switch($orderField) {
         	case "aloitus":
-        		$sql .= " ORDER BY m.first_sent " . $ascdesc;
+        		$sql .= " ORDER BY m.first_sent " . $order;
         		break;
         	case "viimeisin":
-        		$sql .= " ORDER BY m.last_sent " . $ascdesc;
+        		$sql .= " ORDER BY m.last_sent " . $order;
         		break;
         	case "viestejä":
-        		$sql .= " ORDER BY t_message_count " . $ascdesc;
+        		$sql .= " ORDER BY t_message_count " . $order;
         		break;
     	}
         
 
        	$sql .= " LIMIT :limit OFFSET :offset";
 
+       	return $sql;
+	}
 
-		$q = DB::connection()->prepare($sql);
+	public static function all($orderField, $order) {
+		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
+
+		$q->execute();
+
+		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
+
+		$reads = array();
+		foreach($rows as $row) {
+			$reads[$row['thread_id']] = $row['percent'];
+		}
+
+		$q = DB::connection()->prepare(self::generateSql($orderField, $order));
 
 		$q->execute(array(
 			'limit' => 100,
@@ -169,10 +177,10 @@ class Thread extends BaseModel {
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads, $order, $ascdesc);
+		return self::createThreads($rows, $reads, $orderField, $order);
 	}
 
-	public static function allInCategory($cats, $order, $ascdesc) {
+	public static function allInCategory($cats, $orderField, $order) {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $cats) . ') GROUP BY ftr.thread_id, t.category_id');
 
 		$q->execute();
@@ -184,59 +192,7 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
-		switch($order) {
-        	case "aloitus":
-        		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
-        		break;
-        	case "viimeisin":
-        		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)";
-        		break;
-        	case "luettu":
-        		$sql = "SELECT DISTINCT ON(t.id)";
-        		break;
-    	}
-
-        $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
-        m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
-        uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
-        c.name AS c_name
-        FROM forum_thread t
-        INNER JOIN (
-                SELECT
-                        thread_id,
-                        first_value(user_id) OVER w1 AS first_user_id,
-                        first_value(id) OVER w1 AS first_id,
-                        first_value(sent) OVER w1 AS first_sent,
-                        first_value(message) OVER w1 AS first_message,
-                        first_value(user_id) OVER w2 AS last_user_id,
-                        first_value(id) OVER w2 AS last_id,
-                        first_value(sent) OVER w2 AS last_sent,
-                        first_value(message) OVER w2 AS last_message
-                FROM forum_message
-                WINDOW
-                        w1 AS (PARTITION BY thread_id ORDER BY sent ASC),
-                        w2 AS (PARTITION BY thread_id ORDER BY sent DESC)
-        ) m ON t.id = m.thread_id
-        INNER JOIN forum_message m2 ON t.id = m2.thread_id
-        INNER JOIN forum_user uf ON uf.id = m.first_user_id
-        INNER JOIN forum_user ul ON ul.id = m.last_user_id
-        INNER JOIN forum_category c ON c.id = t.category_id
-        WHERE c.id IN (" . implode(',', $cats) . ")
-        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
-
-        switch($order) {
-        	case "aloitus":
-        		$sql .= " ORDER BY m.first_sent " . $ascdesc;
-        		break;
-        	case "viimeisin":
-        		$sql .= " ORDER BY m.last_sent " . $ascdesc;
-        		break;
-    	}
-        
-
-       	$sql .= " LIMIT :limit OFFSET :offset";
-
-		$q = DB::connection()->prepare($sql);
+		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $cats));
 
 		$q->execute(array(
 			'limit' => 100,
@@ -245,7 +201,7 @@ class Thread extends BaseModel {
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads, $order, $ascdesc);
+		return self::createThreads($rows, $reads, $orderField, $order);
 	}
 }
 

@@ -1,30 +1,50 @@
 <?php
 
 class CategoryController extends BaseController {
-	public static function show($id = 'kaikki', $order = 'aloitus', $type = 'laskeva') {
+	public static function show() {
 		parent::checkLoggedIn();
 
 		$cats = Category::all();
-		array_unshift($cats, new Category(array('id' => 'kaikki', 'name' => 'Kaikki')));
+		array_unshift($cats, new Category(array(
+			'id' => 'kaikki',
+			'name' => 'Kaikki',
+			'thread_count' => Category::threadCount()
+		)));
 
-		if($type == 'laskeva') {
-			$ascdesc = 'DESC';
-		} else {
-			$ascdesc = 'ASC';
+		$default = array(
+			'alue' => 'kaikki',
+			'jarjesta' => 'aloitus',
+			'tyyppi' => 'laskeva',
+			'aika' => 'kaikki'
+		);
+
+		$settings = $default;
+
+		foreach(array_keys($default) as $k) {
+			if(isset($_GET[$k])) $settings[$k] = $_GET[$k];
 		}
 
-		if($id == 'kaikki') {
-			$threads = Thread::all($order, $ascdesc);
+
+		if($settings['tyyppi'] == 'laskeva') {
+			$order = 'DESC';
 		} else {
-			$threads = Thread::allInCategory(array($id), $order, $ascdesc);
+			$order = 'ASC';
+		}
+
+		if($settings['alue'] == 'kaikki') {
+			$threads = Thread::all($settings['jarjesta'], $order);
+		} else {
+			$threads = Thread::allInCategory(array($settings['alue']), $settings['jarjesta'], $order);
 		}
 
 		View::make('threads-list.html', array(
 			'cats' => $cats,
-			'cat_selected' => $id,
-			'order_selected' => $order,
-			'type_selected' => $type,
-			'threads' => $threads
+			'cat_selected' => $settings['alue'],
+			'order_selected' => $settings['jarjesta'],
+			'type_selected' => $settings['tyyppi'],
+			'time_selected' => $settings['aika'],
+			'threads' => $threads,
+			'default' => $default
 		));
 	}
 }

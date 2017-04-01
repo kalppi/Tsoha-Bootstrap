@@ -7,18 +7,18 @@
       $twig = self::get_twig();
 
       $url_base = "";
-      $url_format = "";
       $url_default = array();
+      $url_values = array();
 
-      $twig->addFunction(new Twig_SimpleFunction('url_format', function($base, $format, $default) use (&$url_base, &$url_format, &$url_default) {
+      $twig->addFunction(new Twig_SimpleFunction('url_format', function($base, $default, $values) use (&$url_base, &$url_default, &$url_values) {
         $url_base = $base;
-        $url_format = $format;
         $url_default = $default;
+        $url_values = $values;
       }));
 
-      $twig->addFunction(new Twig_SimpleFunction('url', function($changes) use (&$url_base, &$url_format, &$url_default) {
-        $generator = new UrlGenerator($url_default, $url_format);
-        return $url_base ."/". $generator->generate($changes);
+      $twig->addFunction(new Twig_SimpleFunction('url', function($changes) use (&$url_base, &$url_default, &$url_values) {
+        $generator = new UrlGenerator($url_default);
+        return $url_base ."/?". $generator->generate(array_merge($url_values, $changes));
       }));
 
       try{
