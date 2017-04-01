@@ -39,12 +39,14 @@ class CategoryController extends BaseController {
 
 		View::make('threads-list.html', array(
 			'cats' => $cats,
-			'cat_selected' => $settings['alue'],
-			'order_selected' => $settings['jarjesta'],
-			'type_selected' => $settings['tyyppi'],
-			'time_selected' => $settings['aika'],
 			'threads' => $threads,
-			'default' => $default
+			'default' => $default,
+			'selected' => array(
+				'cat' => $settings['alue'],
+				'order' => $settings['jarjesta'],
+				'type' => $settings['tyyppi'],
+				'time' => $settings['aika']
+			)
 		));
 	}
 }

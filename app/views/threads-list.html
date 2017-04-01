@@ -10,15 +10,15 @@
 					<ul>
 						{{
 							url_format(base_path, default, {
-								'alue': cat_selected,
-								'jarjesta': order_selected,
-								'tyyppi': type_selected,
-								'aika': time_selected
+								'alue': selected.cat,
+								'jarjesta': selected.order,
+								'tyyppi': selected.type,
+								'aika': selected.time
 							})
 						}}
 
 						{% for cat in cats %}
-							<li class="{% if cat_selected == cat.id %}selected{% endif %}">
+							<li class="{% if selected.cat == cat.id %}selected{% endif %}">
 								<a href="{{  url({'alue': cat.id}) }}">{{cat.name}}</a>
 							</li>	
 						{% endfor %}
@@ -35,7 +35,7 @@
 
 				<ul>
 					{% for key, time in times %}
-					<li class="{% if time_selected == key %}selected{% endif %}">
+					<li class="{% if selected.time == key %}selected{% endif %}">
 						<a href="{{  url({'aika': key}) }}">{{time}}</a>
 					</li>
 					{% endfor %}
@@ -51,17 +51,17 @@
 
 				<ul>
 					{% for order in orders %}
-					<li class="{% if order_selected == order|lower %}selected{% endif %}">
+					<li class="{% if selected.order == order|lower %}selected{% endif %}">
 						<a href="{{  url({'jarjesta': order|lower}) }}">{{order}}</a>
 					</li>
 					{% endfor %}
 
-					<li class="descending {% if type_selected == 'laskeva' %}selected{% endif %}">
+					<li class="descending {% if selected.type == 'laskeva' %}selected{% endif %}">
 						<a href="{{  url({'tyyppi': 'laskeva'}) }}">
 							<span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Laskeva
 						</a>
 					</li>
-					<li class="ascending {% if type_selected == 'nouseva' %}selected{% endif %}">
+					<li class="ascending {% if selected.type == 'nouseva' %}selected{% endif %}">
 						<a href="{{  url({'tyyppi': 'nouseva'}) }}">
 							<span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span> Nouseva
 						</a>
