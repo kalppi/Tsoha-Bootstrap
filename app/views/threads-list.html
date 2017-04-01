@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container" id="filter-options">
+		<div class="row">
+			<div class="col-md-12">
+				<h4>Alueet</h4>
+
+				<div id="categories">
+					<ul>
+						{{
+							url_format(base_path, 'alue-:alue/jarjesta-:jarjesta/tyyppi-:tyyppi', {
+								'alue': cat_selected,
+								'jarjesta': order_selected,
+								'tyyppi': type_selected
+							})
+						}}
+
+						{% for cat in cats %}
+							<li class="{% if cat_selected == cat.id %}selected{% endif %}">
+								<a href="{{  url({'alue': cat.id}) }}">{{cat.name}}</a>
+							</li>	
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<h4>Järjestys</h4>
+
+				{% set orders = ['Aloitus', 'Viimeisin', 'Viestejä', 'Luettu'] %}
+
+				<ul>
+					{% for order in orders %}
+					<li class="{% if order_selected == order|lower %}selected{% endif %}">
+						<a href="{{  url({'jarjesta': order|lower}) }}">{{order}}</a>
+					</li>
+					{% endfor %}
+				</ul>
+
+				<ul>
+					<li class="{% if type_selected == 'laskeva' %}selected{% endif %}">
+						<a href="{{  url({'tyyppi': 'laskeva'}) }}">
+							<span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Laskeva
+						</a>
+					</li>
+					<li class="{% if type_selected == 'nouseva' %}selected{% endif %}">
+						<a href="{{  url({'tyyppi': 'nouseva'}) }}">
+							<span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span> Nouseva
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="col-md-9">
+				<h4>Ajalta</h4>
+			</div>
+		</div>
+	</div>
+
+	<h3>Keskustelut</h3>
+
+	{% include 'threads-table.html' %}
+
+{% endblock %}

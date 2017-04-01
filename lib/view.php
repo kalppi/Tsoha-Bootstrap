@@ -1,10 +1,25 @@
 <?php
 
-  class View{
+  class View {
 
-    public static function make($view, $content = array()){
+    public static function make($view, $content = array()) {
       // Alustetaan Twig
       $twig = self::get_twig();
+
+      $url_base = "";
+      $url_format = "";
+      $url_default = array();
+
+      $twig->addFunction(new Twig_SimpleFunction('url_format', function($base, $format, $default) use (&$url_base, &$url_format, &$url_default) {
+        $url_base = $base;
+        $url_format = $format;
+        $url_default = $default;
+      }));
+
+      $twig->addFunction(new Twig_SimpleFunction('url', function($changes) use (&$url_base, &$url_format, &$url_default) {
+        $generator = new UrlGenerator($url_default, $url_format);
+        return $url_base ."/". $generator->generate($changes);
+      }));
 
       try{
         // Asetetaan uudelleenohjauksen yhteydessä lisätty viesti
@@ -14,7 +29,7 @@
         $content['base_path'] = BASE_PATH;
 
         // Asetetaan näkymään kirjautunut käyttäjä, jos get_user_logged_in-metodi on toteutettu
-        if(method_exists('BaseController', 'getLoggedInUser')){
+        if(method_exists('BaseController', 'getLoggedInUser')) {
           $content['user'] = BaseController::getLoggedInUser();
         }
 
@@ -35,7 +50,7 @@
       return new Twig_Environment($twig_loader);
     }
 
-    private static function set_flash_message(&$content){
+    private static function set_flash_message(&$content) {
       if(isset($_SESSION['flash_message'])){
 
         $flash = json_decode($_SESSION['flash_message']);

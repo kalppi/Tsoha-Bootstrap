@@ -1,23 +1,30 @@
 <?php
 
 class CategoryController extends BaseController {
-	public static function index() {
+	public static function show($id = 'kaikki', $order = 'aloitus', $type = 'laskeva') {
 		parent::checkLoggedIn();
 
-		View::make('thread-list.html', array(
-			'cats' => Category::all(),
-			'cat_selected' => 'all',
-			'threads' => Thread::all()
-		));
-	}
+		$cats = Category::all();
+		array_unshift($cats, new Category(array('id' => 'kaikki', 'name' => 'Kaikki')));
 
-	public static function show($id) {
-		parent::checkLoggedIn();
+		if($type == 'laskeva') {
+			$ascdesc = 'DESC';
+		} else {
+			$ascdesc = 'ASC';
+		}
 
-		View::make('thread-list.html', array(
-			'cats' => Category::all(),
+		if($id == 'kaikki') {
+			$threads = Thread::all($order, $ascdesc);
+		} else {
+			$threads = Thread::allInCategory(array($id), $order, $ascdesc);
+		}
+
+		View::make('threads-list.html', array(
+			'cats' => $cats,
 			'cat_selected' => $id,
-			'threads' => Thread::allInCategory(array($id))
+			'order_selected' => $order,
+			'type_selected' => $type,
+			'threads' => $threads
 		));
 	}
 }

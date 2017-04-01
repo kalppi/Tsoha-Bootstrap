@@ -22,7 +22,7 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	private static function createThreads($rows, $reads) {
+	private static function createThreads($rows, $reads, $order, $ascdesc) {
 		$threads = array();
 
 		foreach($rows as $row) {
@@ -70,10 +70,24 @@ class Thread extends BaseModel {
 			));
 		}
 
+		if($order == 'luettu') {
+			if($ascdesc == 'ASC') {
+				$av = -1;
+				$bv = 1;
+			} else {
+				$av = 1;
+				$bv = -1;
+			}
+
+			usort($threads, function($a, $b) use($av, $bv) {
+				return ($a->read_percent < $b->read_percent) ? $av : $bv;
+			});
+		}
+
 		return $threads;
 	}
 
-	public static function all() {
+	public static function all($order, $ascdesc) {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
 
 		$q->execute();
@@ -85,9 +99,25 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
+		switch($order) {
+        	case "aloitus":
+        		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
+        		break;
+        	case "viimeisin":
+        		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)";
+        		break;
+        	case "viestejä":
+        		$sql = "SELECT DISTINCT ON(t.id, t_message_count)";
+        		break;
+        	case "luettu":
+        		$sql = "SELECT DISTINCT ON(t.id)";
+        		break;
+        	default:
+        		throw new Exception('Unknown order (' . $order . ")");
+    	}
+        
 
-		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)
-        t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
+        $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
         m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
         uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
         c.name AS c_name
@@ -112,9 +142,22 @@ class Thread extends BaseModel {
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
         INNER JOIN forum_category c ON c.id = t.category_id
-        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id
-        ORDER BY m.last_sent DESC
-        LIMIT :limit OFFSET :offset";
+        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
+        
+        switch($order) {
+        	case "aloitus":
+        		$sql .= " ORDER BY m.first_sent " . $ascdesc;
+        		break;
+        	case "viimeisin":
+        		$sql .= " ORDER BY m.last_sent " . $ascdesc;
+        		break;
+        	case "viestejä":
+        		$sql .= " ORDER BY t_message_count " . $ascdesc;
+        		break;
+    	}
+        
+
+       	$sql .= " LIMIT :limit OFFSET :offset";
 
 
 		$q = DB::connection()->prepare($sql);
@@ -126,10 +169,10 @@ class Thread extends BaseModel {
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads);
+		return self::createThreads($rows, $reads, $order, $ascdesc);
 	}
 
-	public static function allInCategory($cats) {
+	public static function allInCategory($cats, $order, $ascdesc) {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $cats) . ') GROUP BY ftr.thread_id, t.category_id');
 
 		$q->execute();
@@ -141,9 +184,19 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
+		switch($order) {
+        	case "aloitus":
+        		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
+        		break;
+        	case "viimeisin":
+        		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)";
+        		break;
+        	case "luettu":
+        		$sql = "SELECT DISTINCT ON(t.id)";
+        		break;
+    	}
 
-		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)
-        t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
+        $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
         m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
         uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
         c.name AS c_name
@@ -169,9 +222,19 @@ class Thread extends BaseModel {
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
         INNER JOIN forum_category c ON c.id = t.category_id
         WHERE c.id IN (" . implode(',', $cats) . ")
-        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id
-        ORDER BY m.last_sent DESC
-        LIMIT :limit OFFSET :offset";
+        GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
+
+        switch($order) {
+        	case "aloitus":
+        		$sql .= " ORDER BY m.first_sent " . $ascdesc;
+        		break;
+        	case "viimeisin":
+        		$sql .= " ORDER BY m.last_sent " . $ascdesc;
+        		break;
+    	}
+        
+
+       	$sql .= " LIMIT :limit OFFSET :offset";
 
 		$q = DB::connection()->prepare($sql);
 
@@ -182,7 +245,7 @@ class Thread extends BaseModel {
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads);
+		return self::createThreads($rows, $reads, $order, $ascdesc);
 	}
 }
 

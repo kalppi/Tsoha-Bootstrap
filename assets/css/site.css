@@ -4,6 +4,20 @@
   margin: 0px auto;
 }
 
+.navbar {
+	margin-bottom: 0;
+}
+
+h1 {
+	font-size: 30px;
+}
+
+.page-header {
+	margin-top: 0;
+	padding-bottom: 0;
+	margin-bottom: 10px;
+}
+
 .navbar .container-fluid {
   max-width: 1200px;
   margin: 0px auto;
@@ -35,30 +49,40 @@
 	float: right;
 }
 
-#categories {
-	margin-left: 20px;
+#filter-options {
 	margin-bottom: 30px;
 }
 
-#categories ul {
+#filter-options ul {
 	list-style-type: none;
 	padding: 0;
 }
 
-#categories ul li {
+#filter-options ul li {
 	display: inline-block;
-	background: #eee;
-	border: 1px solid #ccc;
-	padding: 6px 8px;
+	padding: 3px 4px;
 }
 
-#categories ul li.selected {
-	background: #666;
-}
-
-#categories ul li.selected a {
+#filter-options ul li a {
+	display: inline-block;
+	padding: 6px 4px;
+	background: #428BCA;
+	border-radius: 5px;
 	color: white;
-	border-color: #333;
+}
+
+#filter-options ul li a:hover {
+	text-decoration: none;
+}
+
+#filter-options ul li.selected {
+	padding: 0;
+}
+
+#filter-options ul li.selected a {
+	color: white;
+	background: #285E8E;
+	padding: 10px 8px;
 }
 
 #threads {
