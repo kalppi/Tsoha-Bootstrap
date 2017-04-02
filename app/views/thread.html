@@ -5,39 +5,15 @@
 		<h2>Keskustelu: Yleinen / asdasdasd</h2>
 	</div>
 
-	<div class="message level-1">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vitae condimentum risus, at vestibulum augue. Duis ut elit odio. Mauris nec facilisis lectus. Duis imperdiet efficitur dolor, vitae faucibus arcu aliquet nec. Maecenas leo sem, ullamcorper sed gravida mollis, consectetur viverra quam. Fusce bibendum purus sed ligula placerat fringilla. Nullam quis diam non lacus aliquet congue sed sed ex. Curabitur sed efficitur metus. 
-	</div>
-
-	<div class="message level-2">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Cras tempor placerat felis, non commodo augue congue eu. Phasellus id dapibus turpis, vitae accumsan risus. Cras ac neque est. Etiam lacinia nisi velit, a auctor mauris auctor at. Duis tempus rhoncus finibus. Etiam ut mi faucibus, ultrices nibh ut, lacinia purus. Nullam luctus laoreet dignissim. Praesent mollis placerat ex, sed cursus lorem aliquet in. Fusce vitae sapien eu est lobortis molestie. Donec purus justo, mollis vitae laoreet nec, porttitor in odio. Cras arcu est, auctor in cursus ac, tempus nec lacus. 
-	</div>
-
-	<div class="message level-2">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Cras ac sagittis nibh. Fusce eleifend sit amet nulla sed interdum. Duis a hendrerit quam. Fusce mauris enim, aliquet a dapibus vel, fringilla a tellus. Maecenas ut magna hendrerit, molestie tellus id, congue tellus. Nam fermentum at nulla sit amet sollicitudin. Donec rhoncus et tortor volutpat hendrerit. 
-	</div>
-
-	<div class="message level-3">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Mauris vitae erat non eros ullamcorper vulputate eget nec erat. Morbi ac volutpat neque. Quisque lacinia volutpat metus id ullamcorper. Fusce congue, lectus sed condimentum bibendum, tortor elit interdum ante, ut pharetra nisi purus non dolor. Vestibulum imperdiet purus eu leo imperdiet, a ullamcorper sem viverra. Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus pellentesque ac est in auctor. 
-	</div>
-
-	<div class="message level-2">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Aenean semper rutrum sem, vitae porta quam imperdiet sit amet. Curabitur euismod, dui sit amet lobortis finibus, urna mauris aliquet ligula, in posuere nunc velit a metus. Etiam ac fermentum nulla, ut sodales neque.
-	</div>
-
-	<div class="message level-1">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		Ut nulla est, dignissim sed nunc in, blandit laoreet nibh. Praesent massa erat, lacinia ut blandit sollicitudin, mattis ut sem. Nulla scelerisque, leo in pulvinar efficitur, ipsum arcu fermentum nisi, vel ullamcorper nibh nunc ultrices felis. Duis nibh est, laoreet nec ligula at, consectetur suscipit metus. Morbi sit amet ligula ac enim faucibus suscipit non non purus. Maecenas eget egestas diam. Mauris auctor bibendum eros, et elementum nisi ullamcorper sit amet. Proin sodales, mi sed tempus mattis, arcu elit mattis sapien, vitae pellentesque quam nunc ut turpis. Mauris rhoncus dictum porttitor. 
-	</div>
-
-	<div class="message level-1">
-		<div class="info"><span class="name">pera</span><span class="time">12.2.17 22:12</span></div>
-		 Duis iaculis at mi sit amet interdum. Sed sed lacus at sem tincidunt molestie. Nunc ac nulla augue. Etiam dignissim eros eget erat volutpat, vel volutpat enim auctor. Aenean eu aliquet justo. Aenean ac fringilla enim. Suspendisse vitae porttitor orci, id maximus quam. Donec malesuada pulvinar leo, eget blandit justo posuere a. Nunc accumsan, lacus sit amet sodales facilisis, mi metus blandit quam, et mollis nulla ipsum vitae est. 
-	</div>
-
+	{% for message in messages %}
+		<div class="message level-{{message.depth}}">
+			<div class="info">
+				<span class="name"></span>
+				<span class="time">{{message.sent}}</span>
+			</div>
+			<div class="text">
+				{{message.message}}
+			</div>
+		</div>
+	{% endfor %}
 {% endblock %}

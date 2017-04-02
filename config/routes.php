@@ -8,8 +8,8 @@ $routes->get('/uusi-viesti', function() {
 	MainController::newMessage();
 });
 
-$routes->get('/ketju', function() {
-	MainController::thread();
+$routes->get('/ketju/:id', function($id) {
+	ThreadController::view($id);
 });
 
 $routes->get('/kayttaja/kaikki', function() {

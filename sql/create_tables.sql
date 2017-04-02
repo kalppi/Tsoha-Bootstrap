@@ -1,44 +1,44 @@
 CREATE TABLE forum_user (
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(50) UNIQUE,
-	hash VARCHAR(255),
-	email VARCHAR(100),
-	accepted BOOLEAN DEFAULT FALSE,
-	admin BOOLEAN DEFAULT FALSE,
-	registered TIMESTAMPTZ DEFAULT now()
+	name VARCHAR(50) UNIQUE NOT NULL,
+	hash VARCHAR(255) NOT NULL,
+	email VARCHAR(100) NOT NULL,
+	accepted BOOLEAN DEFAULT FALSE NOT NULL,
+	admin BOOLEAN DEFAULT FALSE NOT NULL,
+	registered TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
 CREATE TABLE forum_category (
 	id SERIAL PRIMARY KEY,
-	name VARCHAR(100) UNIQUE
+	name VARCHAR(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE forum_thread (
 	id SERIAL PRIMARY KEY,
-	category_id INTEGER REFERENCES forum_category (id),
-	title VARCHAR(200)
+	category_id INTEGER REFERENCES forum_category (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	title VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE forum_message (
 	id SERIAL PRIMARY KEY,
 	thread_id INTEGER REFERENCES forum_thread (id),
-	parent_id INTEGER REFERENCES forum_message (id) DEFAULT NULL,
-	user_id INTEGER REFERENCES forum_user (id),
-	sent TIMESTAMPTZ DEFAULT NOW(),
-	message TEXT
+	parent_id INTEGER REFERENCES forum_message (id) ON UPDATE CASCADE ON DELETE CASCADE DEFAULT NULL,
+	user_id INTEGER REFERENCES forum_user (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	sent TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+	message TEXT NOT NULL
 );
 
 CREATE TABLE forum_thread_read (
 	id SERIAL PRIMARY KEY,
-	thread_id INTEGER REFERENCES forum_thread (id),
-	user_id INTEGER REFERENCES forum_user (id),
-	last_message_id INTEGER REFERENCES forum_message (id),
+	thread_id INTEGER REFERENCES forum_thread (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	user_id INTEGER REFERENCES forum_user (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	last_message_id INTEGER REFERENCES forum_message (id) ON UPDATE CASCADE ON DELETE SET NULL,
 	UNIQUE (thread_id, user_id)
 );
 
 CREATE TABLE forum_login_token (
 	id SERIAL PRIMARY KEY,
-	token VARCHAR(64),
-	user_id INTEGER REFERENCES forum_user (id),
-	last_active TIMESTAMPTZ DEFAULT NOW()
+	token VARCHAR(64) NOT NULL,
+	user_id INTEGER REFERENCES forum_user (id) ON UPDATE CASCADE ON DELETE CASCADE,
+	last_active TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );

@@ -15,6 +15,14 @@ INSERT INTO forum_message (thread_id, user_id, message, sent) VALUES
 	(2, 1, 'Joo...', now() - INTERVAL '2 days 1 hours'),
 	(3, 3, 'Jepa', now() - INTERVAL '1 hours 30 minutes');
 
+INSERT INTO forum_message (thread_id, parent_id, user_id, message, sent) VALUES
+	(3, NULL, 2, 'asd', now() - INTERVAL '1 hours 20 minutes'),
+	(3, NULL, 1, 'hhhh', now() - INTERVAL '1 hours 10 minutes'),
+	(3, 6, 1, 'asd+asd', now() - INTERVAL '20 minutes'),
+	(3, 8, 1, 'asd+asd+asd', now() - INTERVAL '15 minutes'),
+	(3, 8, 2, 'asd+asd+asd2', now() - INTERVAL '12 minutes'),
+	(3, 7, 3, 'hhhh+hhhh', now() - INTERVAL '10 minutes')
+;
 INSERT INTO forum_thread_read (thread_id, user_id, last_message_id) VALUES
 	(1, 1, 2),
 	(1, 2, 1),
