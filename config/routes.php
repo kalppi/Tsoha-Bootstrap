@@ -1,7 +1,7 @@
 <?php
 
 $routes->get('/', function() {
-	CategoryController::show();
+	CategoryController::list();
 });
 
 $routes->get('/uusi-viesti', function() {

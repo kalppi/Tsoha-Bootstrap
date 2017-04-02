@@ -28,6 +28,10 @@
   // Otetaan Composer käyttöön
   require 'vendor/autoload.php';
 
+  if(getenv('APPLICATION_ENV') == 'dev') {
+    SassCompiler::run("assets/scss/", "assets/css/");
+  }
+
   $routes = new \Slim\Slim();
   $routes->add(new \Zeuxisoo\Whoops\Provider\Slim\WhoopsMiddleware);
 

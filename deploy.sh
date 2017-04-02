@@ -5,6 +5,10 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 source $DIR/config/environment.sh
 
+echo "Luodaan css..."
+
+bash compilescss.sh
+
 echo "Siirretään tiedostot users-palvelimelle..."
 
 # Tämä komento siirtää tiedostot palvelimelta

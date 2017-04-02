@@ -1,78 +1,85 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="container" id="filter-options">
+	{% set column_sizes = [8, 4] %}
+
+	<div class="container" id="content">
 		<div class="row">
-			<div class="col-md-12">
-				<h5>Alueet</h5>
+			<div class="col-md-{{column_sizes[0]}}">
+				{% include 'threads-table.html' %}
+			</div>
+			<div class="col-md-{{column_sizes[1]}}">
+				<div class="container" id="filter-options">
+					<div class="row">
+						<div class="col-md-{{column_sizes[1]}}">
+							<h5>Alueet</h5>
 
-				<div id="categories">
-					<ul>
-						{{
-							url_format(base_path, default, {
-								'alue': selected.cat,
-								'jarjesta': selected.order,
-								'tyyppi': selected.type,
-								'aika': selected.time
-							})
-						}}
+							<div id="categories">
+								<ul>
+									{{
+										url_format(base_path, default, {
+											'alue': selected.cat,
+											'jarjesta': selected.order,
+											'tyyppi': selected.type,
+											'aika': selected.time
+										})
+									}}
 
-						{% for cat in cats %}
-							<li class="{% if selected.cat == cat.id %}selected{% endif %}">
-								<a href="{{  url({'alue': cat.id}) }}">{{cat.name}}</a>
-							</li>	
-						{% endfor %}
-					</ul>
+									{% for cat in cats %}
+										<li class="{% if selected.cat == cat.id %}selected{% endif %}">
+											<a href="{{  url({'alue': cat.id}) }}">{{cat.name}}</a>
+										</li>	
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-{{column_sizes[1]}}">
+							<h5>Aloitettu</h5>
+
+							{% set times = {'kaikki': 'Milloin tahansa', 'kuukausi': 'Viimeinen kuukausi', 'viikko': 'Viimeinen viikko', 'päivä': 'Viimeinen päivä'} %}
+
+							<ul>
+								{% for key, time in times %}
+								<li class="{% if selected.time == key %}selected{% endif %}">
+									<a href="{{  url({'aika': key}) }}">{{time}}</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-{{column_sizes[1]}}">
+							<h5>Järjestys</h5>
+
+							{% set orders = ['Aloitus', 'Viimeisin', 'Viestejä', 'Luettu'] %}
+
+							<ul>
+								{% for order in orders %}
+								<li class="{% if selected.order == order|lower %}selected{% endif %}">
+									<a href="{{  url({'jarjesta': order|lower}) }}">{{order}}</a>
+								</li>
+								{% endfor %}
+							</ul>
+							<ul>
+								<li class="descending {% if selected.type == 'laskeva' %}selected{% endif %}">
+									<a href="{{  url({'tyyppi': 'laskeva'}) }}">
+										<span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Laskeva
+									</a>
+								</li>
+								<li class="ascending {% if selected.type == 'nouseva' %}selected{% endif %}">
+									<a href="{{  url({'tyyppi': 'nouseva'}) }}">
+										<span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span> Nouseva
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="row">
-			<div class="col-md-5">
-				<h5>Aloitettu</h5>
-
-				{% set times = {'kaikki': 'Milloin tahansa', 'kuukausi': 'Viimeinen kuukausi', 'viikko': 'Viimeinen viikko', 'päivä': 'Viimeinen päivä'} %}
-
-				<ul>
-					{% for key, time in times %}
-					<li class="{% if selected.time == key %}selected{% endif %}">
-						<a href="{{  url({'aika': key}) }}">{{time}}</a>
-					</li>
-					{% endfor %}
-				</ul>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-12">
-				<h5>Järjestys</h5>
-
-				{% set orders = ['Aloitus', 'Viimeisin', 'Viestejä', 'Luettu'] %}
-
-				<ul>
-					{% for order in orders %}
-					<li class="{% if selected.order == order|lower %}selected{% endif %}">
-						<a href="{{  url({'jarjesta': order|lower}) }}">{{order}}</a>
-					</li>
-					{% endfor %}
-
-					<li class="descending {% if selected.type == 'laskeva' %}selected{% endif %}">
-						<a href="{{  url({'tyyppi': 'laskeva'}) }}">
-							<span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Laskeva
-						</a>
-					</li>
-					<li class="ascending {% if selected.type == 'nouseva' %}selected{% endif %}">
-						<a href="{{  url({'tyyppi': 'nouseva'}) }}">
-							<span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span> Nouseva
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
 	</div>
-
-	<h3>Keskustelut</h3>
-
-	{% include 'threads-table.html' %}
 
 {% endblock %}

@@ -1,7 +1,7 @@
 <?php
 
 class CategoryController extends BaseController {
-	public static function show() {
+	public static function list() {
 		parent::checkLoggedIn();
 
 		$cats = Category::all();
@@ -23,7 +23,6 @@ class CategoryController extends BaseController {
 		foreach(array_keys($default) as $k) {
 			if(isset($_GET[$k])) $settings[$k] = $_GET[$k];
 		}
-
 
 		if($settings['tyyppi'] == 'laskeva') {
 			$order = 'DESC';

@@ -13,7 +13,7 @@
 
     {% block head %}
       <!-- Bootstrap (tyylitiedosto) -->
-      <link href="{{base_path}}/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
       <!-- Oma tyylitiedostomme -->
       <link href="{{base_path}}/assets/css/site.css" rel="stylesheet">
@@ -65,13 +65,8 @@
     </div>
 
     {% block body %}
-      <!-- jQuery -->
-      <script src="{{base_path}}/vendor/jquery.min.js"></script>
-
-      <!-- Bootstrap (skriptitiedosto) -->
-      <script src="{{base_path}}/vendor/bootstrap/js/bootstrap.min.js"></script>
-
-      <!-- Oma skriptitiedostomme -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
       <script src="{{base_path}}/assets/js/site.js"></script>
     {% endblock %}
   </body>

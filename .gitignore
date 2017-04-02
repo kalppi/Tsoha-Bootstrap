@@ -1,10 +1,5 @@
 .DS_Store
 .htaccess
 composer.phar
-vendor/autoload.php
-vendor/composer/
-vendor/filp/
-vendor/raveren/
-vendor/slim/
-vendor/twig/
-vendor/zeuxisoo/
+vendor
+assets/css/*
