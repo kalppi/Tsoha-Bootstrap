@@ -27,12 +27,20 @@ h1 {
 	padding: 10px;
 	margin-bottom: 20px;
 
-	&.level-2 {
-		margin-left: 30px;
+	&.hilight {
+		background: #f7f6cf;
 	}
 
-	&.level-3 {
-		margin-left: 60px;
+	.title {
+		margin: 8px 0 12px 0;
+		font-size: 20px;
+		font-weight: bold;
+	}
+
+	@for $i from 2 through 10 {
+		&.level-#{$i} {
+			margin-left: #{$i * 30 - 30}px;
+		}
 	}
 
 	.info {
@@ -44,6 +52,15 @@ h1 {
 
 		.time {
 			float: right;
+		}
+	}
+
+	.tools {
+		margin-top: 5px;
+
+		a {
+			font-size: 12px;
+			margin-right: 10px;
 		}
 	}
 }
@@ -117,6 +134,6 @@ h1 {
 	}
 }
 
-#content.container {
+.container {
 	padding: 0;
 }

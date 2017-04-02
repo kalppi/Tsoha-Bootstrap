@@ -22,6 +22,61 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
+	public function markAsRead($id, $user) {
+		$q = DB::connection()->prepare(
+			'INSERT INTO forum_thread_read (thread_id, user_id, last_message_id) VALUES'
+		);
+	}
+
+	public function firstMessage() {
+		$q = DB::connection()->prepare(
+			'SELECT
+				m.id, m.thread_id, m.parent_id, m.sent, m.message,
+				u.id AS u_id, u.name AS u_name, u.admin AS u_admin
+			FROM forum_message m
+			INNER JOIN forum_user u ON u.id = m.user_id
+			WHERE thread_id = :thread_id
+			ORDER BY sent ASC LIMIT 1'
+		);
+
+		$q->execute(array('thread_id' => $this->id));
+
+		$row = $q->fetch(PDO::FETCH_ASSOC);
+
+		$user = new User(array(
+			'id' => $row['u_id'],
+			'name' => $row['u_name'],
+			'admin' => $row['u_admin']
+		));
+
+		$row['user'] = $user;
+
+		return new Message($row);
+	}
+
+	public static function get($id) {
+		$q = DB::connection()->prepare(
+			'SELECT
+				t.id, t.title,
+				c.id AS c_id, c.name AS c_name
+			FROM forum_thread t
+			INNER JOIN forum_category c ON c.id = t.category_id
+			WHERE t.id = :id'
+		);
+
+		$q->execute(array('id' => $id));
+		$row = $q->fetch(PDO::FETCH_ASSOC);
+
+		$cat = new Category(array(
+			'id' => $row['c_id'],
+			'name' => $row['c_name']
+		));
+
+		$row['category'] = $cat;
+
+		return new Thread($row);
+	}
+
 	private static function createThreads($rows, $reads, $settings) {
 		$threads = array();
 

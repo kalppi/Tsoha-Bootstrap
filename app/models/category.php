@@ -21,6 +21,18 @@ class Category extends BaseModel {
 		$this->id = $row['id'];
 	}
 
+	public static function get($id) {
+		$q = DB::connection()->prepare(
+			'SELECT * FROM forum_category WHERE id = :id'
+		);
+
+		$q->execute(array('id' => $id));
+
+		$row = $q->fetch(PDO::FETCH_ASSOC);
+
+		return new Category($row);
+	}
+
 	public static function threadCount() {
 		$q = DB::connection()->prepare(
 			'SELECT COUNT(*) FROM forum_thread'

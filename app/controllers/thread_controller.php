@@ -4,10 +4,15 @@ class ThreadController extends BaseController {
 	public static function view($id) {
 		parent::checkLoggedIn();
 
-		$messages = Message::allInThread($id);
+		$thread = Thread::get($id);
+		$messages = Message::allInThread($thread->id);
+
+		$first = array_shift($messages);
 
 		View::make('thread.html', array(
-			'messages' => $messages
+			'thread' => $thread,
+			'messages' => $messages,
+			'message' => $first
 		));	
 	}
 }

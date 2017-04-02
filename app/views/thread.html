@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<div class="page-header">
-		<h2>Keskustelu: Yleinen / asdasdasd</h2>
-	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				{% include 'partial/message.html' with {is_first: true } %}
 
-	{% for message in messages %}
-		<div class="message level-{{message.depth}}">
-			<div class="info">
-				<span class="name"></span>
-				<span class="time">{{message.sent}}</span>
-			</div>
-			<div class="text">
-				{{message.message}}
+				{% include 'partial/reply-form.html' %}
+
+				{% for message in messages %}
+					{% include 'partial/message.html' %}
+				{% endfor %}
 			</div>
 		</div>
-	{% endfor %}
+		<div class="row">
+			<div class="col-md-8">
+				
+			</div>
+		</div>
+	</div>
 {% endblock %}

@@ -12,6 +12,10 @@ $routes->get('/ketju/:id', function($id) {
 	ThreadController::view($id);
 });
 
+$routes->get('/viesti/:id', function($id) {
+	MessageController::view($id);
+});
+
 $routes->get('/kayttaja/kaikki', function() {
 	UserController::all();
 });

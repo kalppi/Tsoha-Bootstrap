@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+	{% include 'partial/message.html' with {is_first: true} %}
+
+	<div class="alert alert-info" role="alert">
+		<strong>Huomio!</strong> Luet vain osaa keskustelusta; paina <a href="{{base_path}}/ketju/{{thread.id}}">tästä</a> päästäksesi lukemaan koko keskustelua.
+	</div>
+
+	{% for message in messages %}	
+		{% include 'partial/message.html' with {hilight: message.id == hilight_id, additional_depth: parent == null ? 0 : 1} %}
+	{% endfor %}	
+{% endblock %}

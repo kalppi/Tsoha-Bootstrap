@@ -2,4 +2,5 @@
 .htaccess
 composer.phar
 vendor
-assets/css/*
+assets/css
+tmp
