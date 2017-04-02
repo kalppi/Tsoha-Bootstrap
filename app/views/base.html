@@ -12,16 +12,12 @@
     </title>
 
     {% block head %}
-      <!-- Bootstrap (tyylitiedosto) -->
       <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-      <!-- Oma tyylitiedostomme -->
       <link href="{{base_path}}/assets/css/site.css" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Volkhov" rel="stylesheet"> 
     {% endblock %}
   </head>
-
   <body>
-
     <nav class="navbar navbar-default" role="navigation">
       <div class="container-fluid">
 
@@ -32,8 +28,8 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <!-- Sovelluksen nimi -->
-          <a class="navbar-brand" href="{{base_path}}">Keskustelufoorumi</a>
+
+          <a class="navbar-brand" href="{{base_path}}">jaddit - keskustelufoorumi</a>
         </div>
 
         <div class="collapse navbar-collapse" id="navigation">
@@ -51,16 +47,13 @@
             {% endif %}
           </ul>
         </div>
-
-
       </div>
     </nav>
 
     <div id="main-container">
       <div class="page-header">
-        <h1>Keskustelufoorumi</h1>
+        <h1>jaddit</h1>
       </div>
-      <!-- Dynaaminen sisältö tulee tähän -->
       {% block content %}{% endblock %}
     </div>
 

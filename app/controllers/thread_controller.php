@@ -5,6 +5,8 @@ class ThreadController extends BaseController {
 		parent::checkLoggedIn();
 
 		$thread = Thread::get($id);
+		$thread->markAsRead(self::getLoggedInUser());
+
 		$messages = Message::allInThread($thread->id);
 
 		$first = array_shift($messages);

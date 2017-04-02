@@ -12,10 +12,8 @@
 					{% include 'partial/message.html' %}
 				{% endfor %}
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-8">
-				
+			<div class="col-md-4">
+				<span data-size="60" data-percent="{{thread.read_percent}}" class="read-percent">{{thread.read_percent * 100 | round(0, 'floor')}}%</span>
 			</div>
 		</div>
 	</div>

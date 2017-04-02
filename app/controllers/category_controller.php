@@ -43,7 +43,7 @@ class CategoryController extends BaseController {
 				'orderField' => array(
 					'first' => 'Aloitus',
 					'last' => 'Viimeisin',
-					'messages' => 'Viestejä',
+					'messages' => 'Vastauksia',
 					'read' => 'Luettu'
 				),
 				'order' => array(

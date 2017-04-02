@@ -32,7 +32,7 @@ CREATE TABLE forum_thread_read (
 	id SERIAL PRIMARY KEY,
 	thread_id INTEGER REFERENCES forum_thread (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	user_id INTEGER REFERENCES forum_user (id) ON UPDATE CASCADE ON DELETE CASCADE,
-	last_message_id INTEGER REFERENCES forum_message (id) ON UPDATE CASCADE ON DELETE SET NULL,
+	last_message_id INTEGER,
 	UNIQUE (thread_id, user_id)
 );
 

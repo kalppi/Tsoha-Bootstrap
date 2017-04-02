@@ -22,10 +22,27 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	public function markAsRead($id, $user) {
+	public function markAsRead($user) {
 		$q = DB::connection()->prepare(
-			'INSERT INTO forum_thread_read (thread_id, user_id, last_message_id) VALUES'
+			'
+			WITH last_message AS (SELECT m.id FROM forum_thread t
+						INNER JOIN forum_message m ON m.thread_id = t.id
+						WHERE t.id = :thread_id
+						ORDER BY sent DESC
+						LIMIT 1)
+			INSERT INTO
+				forum_thread_read (thread_id, user_id, last_message_id)
+			VALUES
+				(
+					:thread_id,
+					:user_id,
+					(SELECT id FROM last_message)
+				)
+			ON CONFLICT ON CONSTRAINT forum_thread_read_thread_id_user_id_key
+			DO UPDATE SET last_message_id = (SELECT id FROM last_message)'
 		);
+
+		$q->execute(array('thread_id' => $this->id, 'user_id' => $user->id));
 	}
 
 	public function firstMessage() {
@@ -58,10 +75,13 @@ class Thread extends BaseModel {
 		$q = DB::connection()->prepare(
 			'SELECT
 				t.id, t.title,
-				c.id AS c_id, c.name AS c_name
+				c.id AS c_id, c.name AS c_name,
+				COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted = TRUE) AS read_percent
 			FROM forum_thread t
 			INNER JOIN forum_category c ON c.id = t.category_id
-			WHERE t.id = :id'
+			LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id 
+			WHERE t.id = :id
+			GROUP BY t.id, c.id, c.name;'
 		);
 
 		$q->execute(array('id' => $id));
