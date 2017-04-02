@@ -87,7 +87,7 @@ class Thread extends BaseModel {
 		return $threads;
 	}
 
-	private static function generateSql($orderField, $order, $cats = null) {
+	private static function generateSql($orderField, $order, $time, $cats = null) {
 		switch($orderField) {
         	case "aloitus":
         		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
@@ -132,8 +132,30 @@ class Thread extends BaseModel {
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
         INNER JOIN forum_category c ON c.id = t.category_id";
 
+        $where = array();
+
         if(is_array($cats)) {
-        	$sql .= " WHERE c.id IN (" . implode(',', $cats) . ")";
+        	$where[] = "c.id IN (" . implode(',', $cats) . ")";
+        }
+
+        switch($time) {
+        	case "vuorokausi":
+        		$where[] = "m.first_sent > NOW() - INTERVAL '1 days'";
+        		break;
+        	case "viikko":
+        		$where[] = "m.first_sent > NOW() - INTERVAL '1 weeks'";
+        		break;
+        	case "kuukausi":
+        		$where[] = "m.first_sent > NOW() - INTERVAL '1 months'";
+        		break;
+        	case "kaikki":
+        		break;
+        	default:
+        		throw new Exception('Unknown time field (' . $time . ")");
+        }
+
+        if(count($where) > 0) {
+        	$sql .= " WHERE " . implode(" AND ", $where);
         }
 
         $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
@@ -156,7 +178,7 @@ class Thread extends BaseModel {
        	return $sql;
 	}
 
-	public static function all($orderField, $order) {
+	public static function all($orderField, $order, $time) {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
 
 		$q->execute();
@@ -168,7 +190,7 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
-		$q = DB::connection()->prepare(self::generateSql($orderField, $order));
+		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $time));
 
 		$q->execute(array(
 			'limit' => 100,
@@ -180,7 +202,7 @@ class Thread extends BaseModel {
 		return self::createThreads($rows, $reads, $orderField, $order);
 	}
 
-	public static function allInCategory($cats, $orderField, $order) {
+	public static function allInCategory($cats, $orderField, $order, $time) {
 		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $cats) . ') GROUP BY ftr.thread_id, t.category_id');
 
 		$q->execute();
@@ -192,7 +214,7 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
-		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $cats));
+		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $time, $cats));
 
 		$q->execute(array(
 			'limit' => 100,

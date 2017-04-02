@@ -31,9 +31,9 @@ class CategoryController extends BaseController {
 		}
 
 		if($settings['alue'] == 'kaikki') {
-			$threads = Thread::all($settings['jarjesta'], $order);
+			$threads = Thread::all($settings['jarjesta'], $order, $settings['aika']);
 		} else {
-			$threads = Thread::allInCategory(array($settings['alue']), $settings['jarjesta'], $order);
+			$threads = Thread::allInCategory(array($settings['alue']), $settings['jarjesta'], $order, $settings['aika']);
 		}
 
 		View::make('threads-list.html', array(
