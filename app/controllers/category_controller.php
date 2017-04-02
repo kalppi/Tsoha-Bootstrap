@@ -6,45 +6,50 @@ class CategoryController extends BaseController {
 
 		$cats = Category::all();
 		array_unshift($cats, new Category(array(
-			'id' => 'kaikki',
+			'id' => 'all',
 			'name' => 'Kaikki',
 			'thread_count' => Category::threadCount()
 		)));
 
 		$default = array(
-			'alue' => 'kaikki',
-			'jarjesta' => 'aloitus',
-			'tyyppi' => 'laskeva',
-			'aika' => 'kaikki'
+			'category' => 'all',
+			'orderField' => 'first',
+			'order' => 'desc',
+			'time' => 'all'
 		);
 
 		$settings = $default;
 
 		foreach(array_keys($default) as $k) {
-			if(isset($_GET[$k])) $settings[$k] = $_GET[$k];
+			if(isset($_GET[$k])) {
+				$settings[$k] = $_GET[$k];
+			}
 		}
 
-		if($settings['tyyppi'] == 'laskeva') {
-			$order = 'DESC';
-		} else {
-			$order = 'ASC';
-		}
-
-		if($settings['alue'] == 'kaikki') {
-			$threads = Thread::all($settings['jarjesta'], $order, $settings['aika']);
-		} else {
-			$threads = Thread::allInCategory(array($settings['alue']), $settings['jarjesta'], $order, $settings['aika']);
-		}
+		$threads = Thread::search($settings);
 
 		View::make('threads-list.html', array(
-			'cats' => $cats,
 			'threads' => $threads,
 			'default' => $default,
-			'selected' => array(
-				'cat' => $settings['alue'],
-				'order' => $settings['jarjesta'],
-				'type' => $settings['tyyppi'],
-				'time' => $settings['aika']
+			'settings' => $settings,
+			'settingsInfo' => array(
+				'category' => $cats,
+				'time' => array(
+					'all' => 'Mikä tahansa',
+					'month' => 'Kuukausi',
+					'week' => 'Viikko',
+					'day' => 'Vuorokausi'
+				),
+				'orderField' => array(
+					'first' => 'Aloitus',
+					'last' => 'Viimeisin',
+					'messages' => 'Viestejä',
+					'read' => 'Luettu'
+				),
+				'order' => array(
+					'desc' => array('Laskeva', 'glyphicon-sort-by-attributes-alt'),
+					'asc' => array('Nouseva', 'glyphicon-sort-by-attributes')
+				)
 			)
 		));
 	}

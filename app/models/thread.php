@@ -22,7 +22,7 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
-	private static function createThreads($rows, $reads, $orderField, $order) {
+	private static function createThreads($rows, $reads, $settings) {
 		$threads = array();
 
 		foreach($rows as $row) {
@@ -70,8 +70,8 @@ class Thread extends BaseModel {
 			));
 		}
 
-		if($orderField == 'luettu') {
-			if($order == 'ASC') {
+		if($settings['orderField'] == 'read') {
+			if(strtolower($settings['order']) == 'asc') {
 				$av = -1;
 				$bv = 1;
 			} else {
@@ -87,22 +87,22 @@ class Thread extends BaseModel {
 		return $threads;
 	}
 
-	private static function generateSql($orderField, $order, $time, $cats = null) {
-		switch($orderField) {
-        	case "aloitus":
+	private static function generateSql($settings) {
+		switch($settings['orderField']) {
+        	case "first":
         		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
         		break;
-        	case "viimeisin":
+        	case "last":
         		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)";
         		break;
-        	case "viestejä":
+        	case "messages":
         		$sql = "SELECT DISTINCT ON(t.id, t_message_count)";
         		break;
-        	case "luettu":
+        	case "read":
         		$sql = "SELECT DISTINCT ON(t.id)";
         		break;
         	default:
-        		throw new Exception('Unknown order field (' . $order . ")");
+        		throw new Exception('Unknown order field (' . $settings['orderField'] . ")");
     	}
         
 
@@ -134,24 +134,26 @@ class Thread extends BaseModel {
 
         $where = array();
 
-        if(is_array($cats)) {
-        	$where[] = "c.id IN (" . implode(',', $cats) . ")";
+        if(is_array($settings['category'])) {
+        	$where[] = "c.id IN (" . implode(',', $settings['category']) . ")";
+        } else if($settings['category'] != 'all') {
+        	$where[] = "c.id = " . intval($settings['category']);
         }
 
-        switch($time) {
-        	case "vuorokausi":
+        switch($settings['time']) {
+        	case "day":
         		$where[] = "m.first_sent > NOW() - INTERVAL '1 days'";
         		break;
-        	case "viikko":
+        	case "week":
         		$where[] = "m.first_sent > NOW() - INTERVAL '1 weeks'";
         		break;
-        	case "kuukausi":
+        	case "month":
         		$where[] = "m.first_sent > NOW() - INTERVAL '1 months'";
         		break;
-        	case "kaikki":
+        	case "all":
         		break;
         	default:
-        		throw new Exception('Unknown time field (' . $time . ")");
+        		throw new Exception('Unknown time field (' . $settings['time'] . ")");
         }
 
         if(count($where) > 0) {
@@ -160,15 +162,15 @@ class Thread extends BaseModel {
 
         $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
         
-        switch($orderField) {
-        	case "aloitus":
-        		$sql .= " ORDER BY m.first_sent " . $order;
+        switch($settings['orderField']) {
+        	case "first":
+        		$sql .= " ORDER BY m.first_sent " . $settings['order'];
         		break;
-        	case "viimeisin":
-        		$sql .= " ORDER BY m.last_sent " . $order;
+        	case "last":
+        		$sql .= " ORDER BY m.last_sent " . $settings['order'];
         		break;
-        	case "viestejä":
-        		$sql .= " ORDER BY t_message_count " . $order;
+        	case "messages":
+        		$sql .= " ORDER BY t_message_count " . $settings['order'];
         		break;
     	}
         
@@ -178,9 +180,16 @@ class Thread extends BaseModel {
        	return $sql;
 	}
 
-	public static function all($orderField, $order, $time) {
-		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id');
+	public static function search($settings) {
+		if($settings['category'] == 'all') {
+			$sql = 'SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id';
+		} else if(is_array($settings['category'])) {
+			$sql = 'SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $settings['category']) . ') GROUP BY ftr.thread_id, t.category_id';
+		} else {
+			$sql = 'SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id = ' . intval($settings['category']) . ' GROUP BY ftr.thread_id, t.category_id';
+		}
 
+		$q = DB::connection()->prepare($sql);
 		$q->execute();
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
@@ -190,7 +199,7 @@ class Thread extends BaseModel {
 			$reads[$row['thread_id']] = $row['percent'];
 		}
 
-		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $time));
+		$q = DB::connection()->prepare(self::generateSql($settings));
 
 		$q->execute(array(
 			'limit' => 100,
@@ -199,31 +208,7 @@ class Thread extends BaseModel {
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads, $orderField, $order);
-	}
-
-	public static function allInCategory($cats, $orderField, $order, $time) {
-		$q = DB::connection()->prepare('SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $cats) . ') GROUP BY ftr.thread_id, t.category_id');
-
-		$q->execute();
-
-		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-
-		$reads = array();
-		foreach($rows as $row) {
-			$reads[$row['thread_id']] = $row['percent'];
-		}
-
-		$q = DB::connection()->prepare(self::generateSql($orderField, $order, $time, $cats));
-
-		$q->execute(array(
-			'limit' => 100,
-			'offset' => 0
-		));
-
-		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-		
-		return self::createThreads($rows, $reads, $orderField, $order);
+		return self::createThreads($rows, $reads, $settings);
 	}
 }
 
