@@ -39,6 +39,20 @@ class User extends BaseModel {
 		return $users;
 	}
 
+	public static function allAccepted() {
+		$q = DB::connection()->prepare('SELECT * FROM forum_user WHERE accepted = TRUE');
+		$q->execute();
+		
+		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
+		$users = array();
+
+		foreach($rows as $row) {
+			$users[] = new User($row);
+		}
+
+		return $users;
+	}
+
 	public static function find($id) {
 		$q = DB::connection()->prepare('SELECT * FROM forum_user WHERE id = :id LIMIT 1');
 		$q->execute(array('id' => $id));

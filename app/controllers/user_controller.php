@@ -77,7 +77,9 @@ class UserController extends BaseController {
 	public static function all() {
 		self::checkLoggedIn();
 
-		View::make('users.html', array('users' => User::all()));
+		$users = User::allAccepted();
+
+		View::make('users.html', array('users' => $users));
 	}
 
 	public static function user($id) {

@@ -13,7 +13,9 @@
 				{% endfor %}
 			</div>
 			<div class="col-md-4">
-				<span data-size="60" data-percent="{{thread.read_percent}}" class="read-percent">{{thread.read_percent * 100 | round(0, 'floor')}}%</span>
+				{% set percent = thread.getReadPercent() %}
+
+				<span data-size="60" data-read="1" data-percent="{{percent}}" class="read-percent">{{percent * 100 | round(0, 'floor')}}%</span>
 			</div>
 		</div>
 	</div>

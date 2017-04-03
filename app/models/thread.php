@@ -22,6 +22,16 @@ class Thread extends BaseModel {
 		$this->id = $row['id'];
 	}
 
+	public function hasRead($user) {
+		$q = DB::connection()->prepare(
+			'SELECT COUNT(*) > 0 FROM forum_thread_read WHERE thread_id = :thread_id AND user_id = :user_id'
+		);
+
+		$q->execute(array('thread_id' => $this->id, 'user_id' => $user->id));
+
+		return $q->fetchColumn();
+	}
+
 	public function markAsRead($user) {
 		$q = DB::connection()->prepare(
 			'
@@ -71,15 +81,25 @@ class Thread extends BaseModel {
 		return new Message($row);
 	}
 
+	public function getReadPercent() {
+		$q = DB::connection()->prepare(
+			'SELECT COUNT(*)::float /
+				(SELECT COUNT(*) FROM forum_user WHERE accepted = TRUE)
+			FROM forum_thread_read WHERE thread_id = :thread_id'
+		);
+
+		$q->execute(array('thread_id' => $this->id));
+
+		return $q->fetchColumn();
+	}
+
 	public static function get($id) {
 		$q = DB::connection()->prepare(
 			'SELECT
 				t.id, t.title,
-				c.id AS c_id, c.name AS c_name,
-				COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted = TRUE) AS read_percent
+				c.id AS c_id, c.name AS c_name
 			FROM forum_thread t
 			INNER JOIN forum_category c ON c.id = t.category_id
-			LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id 
 			WHERE t.id = :id
 			GROUP BY t.id, c.id, c.name;'
 		);
@@ -179,6 +199,8 @@ class Thread extends BaseModel {
         	default:
         		throw new Exception('Unknown order field (' . $settings['orderField'] . ")");
     	}
+
+    	$userId = intval(BaseController::getLoggedInUser()->id);
         
 
         $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
@@ -208,6 +230,18 @@ class Thread extends BaseModel {
         INNER JOIN forum_category c ON c.id = t.category_id";
 
         $where = array();
+
+        if($settings['read'] != 'all') {
+        	 $sql .= " LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id AND ftr.user_id = " . $userId;
+
+        	 $where[] = 'ftr.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
+        }
+
+        if($settings['participated'] != 'all') {
+    		$sql .= ' LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = ' . $userId;
+
+    		$where[] = 'm3.thread_id IS ' . ($settings['participated'] == 'yes' ? 'NOT NULL' : 'NULL');
+    	}
 
         if(is_array($settings['category'])) {
         	$where[] = "c.id IN (" . implode(',', $settings['category']) . ")";
@@ -247,8 +281,7 @@ class Thread extends BaseModel {
         	case "messages":
         		$sql .= " ORDER BY t_message_count " . $settings['order'];
         		break;
-    	}
-        
+    	}       
 
        	$sql .= " LIMIT :limit OFFSET :offset";
 

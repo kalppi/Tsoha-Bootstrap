@@ -9,8 +9,10 @@
 	<td class="title"><a href="{{base_path}}/ketju/{{thread.id}}">{{thread.title}}</a></td>
 	<td class="first"><div><a href="{{base_path}}/kayttaja/{{thread.first_message.user.id}}">{{thread.first_message.user.name}}</a></div><small>{{thread.first_message.sent|date("d.m. Y H:i:s")}}</small></td>
 	<td class="last"><div><a href="{{base_path}}/kayttaja/{{thread.last_message.user.id}}">{{thread.last_message.user.name}}</a></div><small>{{thread.last_message.sent|date("d.m. Y H:i:s")}}</small></td>
-	<td class="count">{{thread.message_count - 1}}</td>
-	<td class="percent"><a href="#" data-size="40" data-percent="{{thread.read_percent}}" class="read-percent">{{thread.read_percent * 100 | round(0, 'floor')}}%</a></td>
+	<td class="count">{{thread.message_count - 1}} {{thread.participated}}</td>
+	<td class="percent">
+		<a href="#" data-size="40" data-read="{{thread.hasRead(user)}}" data-percent="{{thread.read_percent}}" class="read-percent">{{thread.read_percent * 100 | round(0, 'floor')}}%</a>
+	</td>
 </tr>
 {% endfor %}
 

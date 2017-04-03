@@ -6,6 +6,8 @@
 	<div class="container" id="content">
 		<div class="row">
 			<div class="col-md-{{column_sizes[0]}}">
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quis nunc at lacus pellentesque ornare eget et ex. Vestibulum id elit et sapien venenatis mattis. Duis eu libero ac quam dapibus tempus. Aliquam libero nulla, pellentesque id lorem non, finibus porttitor ipsum. Pellentesque a augue a metus ultrices volutpat non quis quam. Praesent viverra id mi nec aliquet. Nullam faucibus et tortor sed volutpat. Praesent quis porttitor elit.</p>
+
 				{% include 'partial/threads-table.html' %}
 			</div>
 			<div class="col-md-{{column_sizes[1]}}">
@@ -42,7 +44,6 @@
 							</ul>
 						</div>
 					</div>
-
 					<div class="row">
 						<div class="col-md-{{column_sizes[1]}}">
 							<h5>Järjestys</h5>
@@ -61,6 +62,32 @@
 									<a href="{{  url({order: name}) }}">
 										<span class="glyphicon {{data[1]}}" aria-hidden="true"></span> {{data[0]}}
 									</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-{{column_sizes[1]}}">
+							<h5>Itse lukenut</h5>
+
+							<ul>
+								{% for name, text in settingsInfo.read %}
+								<li class="{% if settings.read == name %}selected{% endif %}">
+									<a href="{{  url({read: name}) }}">{{text}}</a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-{{column_sizes[1]}}">
+							<h5>Itse osallistunut</h5>
+
+							<ul>
+								{% for name, text in settingsInfo.participated %}
+								<li class="{% if settings.participated == name %}selected{% endif %}">
+									<a href="{{  url({participated: name}) }}">{{text}}</a>
 								</li>
 								{% endfor %}
 							</ul>

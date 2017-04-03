@@ -15,7 +15,9 @@ class CategoryController extends BaseController {
 			'category' => 'all',
 			'orderField' => 'first',
 			'order' => 'desc',
-			'time' => 'all'
+			'time' => 'all',
+			'read' => 'all',
+			'participated' => 'all'
 		);
 
 		$settings = $default;
@@ -49,6 +51,16 @@ class CategoryController extends BaseController {
 				'order' => array(
 					'desc' => array('Laskeva', 'glyphicon-sort-by-attributes-alt'),
 					'asc' => array('Nouseva', 'glyphicon-sort-by-attributes')
+				),
+				'read' => array(
+					'all' => 'Kaikki',
+					'no' => 'Ei',
+					'yes' => 'Kyllä'
+				),
+				'participated' => array(
+					'all' => 'Kaikki',
+					'no' => 'Ei',
+					'yes' => 'Kyllä'
 				)
 			)
 		));

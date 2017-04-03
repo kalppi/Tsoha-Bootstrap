@@ -75,8 +75,7 @@ h1 {
 	}
 
 	h5 {
-		margin-top: 5px;
-		margin-bottom: 5px;
+		margin: 0 0 3px 0;
 	}
 
 	ul {
@@ -89,10 +88,12 @@ h1 {
 
 			a {
 				display: inline-block;
-				padding: 6px 4px;
+				padding: 5px 4px;
 				background: #428BCA;
 				border-radius: 5px;
 				color: white;
+				min-width: 50px;
+				text-align: center;
 
 				&:hover {
 					text-decoration: none;
@@ -105,7 +106,7 @@ h1 {
 				a {
 					color: white;
 					background: #285E8E;
-					padding: 10px 8px;
+					padding: 7px 8px;
 				}
 			}
 		}
@@ -113,6 +114,8 @@ h1 {
 }
 
 #threads {
+	margin-top: 20px;
+
 	.category {
 		width: 100px;
 	}
