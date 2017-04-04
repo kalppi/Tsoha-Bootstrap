@@ -1,5 +1,5 @@
 <a name="viesti-{{message.id}}" />
-<div class="message level-{{message.depth + additional_depth}} {% if hilight  %}hilight{% endif %}">
+<div class="thread-message level-{{message.depth + additional_depth}} {% if hilight  %}hilight{% endif %}">
 	{% if is_first %}
 		<h3 class="title">
 			<a href="{{base_path}}">Keskustelu</a>
@@ -17,7 +17,7 @@
 		{{message.message}}
 	</div>
 	<div class="tools">
-		{% if not is_first  %}
+		{% if not is_first and not lite  %}
 			<a href="">Vastaa tähän</a>
 			<a href="{{base_path}}/viesti/{{message.id}}">Linkki</a>
 		{% endif %}

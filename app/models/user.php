@@ -1,7 +1,7 @@
 <?php
 
 class User extends BaseModel {
-	public $id, $name, $hash, $email, $admin;
+	public $id, $name, $hash, $email, $admin, $accepted, $registered;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);

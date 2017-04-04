@@ -22,7 +22,7 @@ h1 {
 	padding-bottom: 0;
 }
 
-.message {
+.thread-message {
 	border: 1px solid #ddd;
 	padding: 10px;
 	margin-bottom: 10px;
@@ -117,7 +117,7 @@ h1 {
 	margin-top: 20px;
 
 	.category {
-		width: 100px;
+		width: 130px;
 	}
 
 	.first, .last {
@@ -139,4 +139,32 @@ h1 {
 
 .container {
 	padding: 0;
+}
+
+#user-info {
+	td:first-child {
+		width: 200px;
+	}
+}
+
+#user-messages {
+	.is-thread-start {
+		width: 80px;
+	}
+
+	td.is-thread-start {
+		text-align: center;	
+	}
+
+	.category {
+		width: 130px;
+	}
+
+	.title {
+		min-width: 250px;
+	}
+
+	.time {
+		width: 160px;
+	}
 }

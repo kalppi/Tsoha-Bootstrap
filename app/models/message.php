@@ -111,7 +111,40 @@ class Message extends BaseModel {
 		}
 
 		return $messages;
+	}
 
+	public static function allByUser($user) {
+		$q = DB::connection()->prepare(
+			'SELECT m.id AS m_id, t.id AS t_id, t.title t_title, c.id AS c_id, c.name AS c_name, m.sent AS m_sent,
+			m2.id = m.id AS t_is_start,
+			CASE WHEN length(m.message) > :max_length
+				THEN substring(m.message from 1 for :max_length) || \'...\'
+				ELSE m.message
+			END as m_preview
+			FROM forum_message m
+			INNER JOIN forum_thread t ON t.id = m.thread_id
+			INNER JOIN forum_category c ON c.id = t.category_id 
+			INNER JOIN (
+				SELECT
+					m.thread_id, first_value(m.id) OVER w1 AS id, first_value(m.user_id) OVER w1 AS user_id
+				FROM forum_message m
+				WINDOW w1 AS (PARTITION BY m.thread_id ORDER BY sent ASC)
+			) m2 ON m2.thread_id = t.id
+			WHERE m.user_id = :user_id
+			GROUP BY m.thread_id, m.id, t.id, c.id, c.name, m2.id, m2.user_id
+			ORDER BY m.sent DESC'
+		);
+
+		$q->execute(array('user_id' => $user->id, 'max_length' => 100));
+
+		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
+		$messages = array();
+
+		foreach($rows as $row) {
+			$messages[] = (object)$row;
+		}
+
+		return $messages;
 	}
 
 	public static function allInThread($id) {

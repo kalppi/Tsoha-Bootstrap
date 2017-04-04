@@ -117,7 +117,7 @@ class Thread extends BaseModel {
 		return new Thread($row);
 	}
 
-	private static function createThreads($rows, $reads, $settings) {
+	private static function createThreads($rows, $settings) {
 		$threads = array();
 
 		foreach($rows as $row) {
@@ -161,7 +161,7 @@ class Thread extends BaseModel {
 				'message_count' => $row['t_message_count'],
 				'first_message' => $firstMessage,
 				'last_message' => $lastMessage,
-				'read_percent' => isset($reads[$row['t_id']]) ? $reads[$row['t_id']] : 0
+				'read_percent' => $row['t_read_percent']
 			));
 		}
 
@@ -182,31 +182,39 @@ class Thread extends BaseModel {
 		return $threads;
 	}
 
-	private static function generateSql($settings) {
+	public static function search($settings) {
+		$input = array(
+			'limit' => 100,
+			'offset' => 0
+		);
+
+		$sql = 'WITH ftr AS (SELECT thread_id, COUNT(*)::float /
+				(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS read_percent
+				FROM forum_thread_read
+				GROUP BY thread_id)';
+
 		switch($settings['orderField']) {
         	case "first":
-        		$sql = "SELECT DISTINCT ON(t.id, m.first_sent)";
+        		$sql .= "SELECT DISTINCT ON(t.id, m.first_sent)";
         		break;
         	case "last":
-        		$sql = "SELECT DISTINCT ON(t.id, m.last_sent)";
+        		$sql .= "SELECT DISTINCT ON(t.id, m.last_sent)";
         		break;
         	case "messages":
-        		$sql = "SELECT DISTINCT ON(t.id, t_message_count)";
+        		$sql .= "SELECT DISTINCT ON(t.id, t_message_count)";
         		break;
         	case "read":
-        		$sql = "SELECT DISTINCT ON(t.id)";
+        		$sql .= "SELECT DISTINCT ON(t.id)";
         		break;
         	default:
         		throw new Exception('Unknown order field (' . $settings['orderField'] . ")");
     	}
 
-    	$userId = intval(BaseController::getLoggedInUser()->id);
-        
-
         $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
         m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
         uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
-        c.name AS c_name
+        c.name AS c_name,
+        ftr.read_percent AS t_read_percent
         FROM forum_thread t
         INNER JOIN (
                 SELECT
@@ -227,26 +235,28 @@ class Thread extends BaseModel {
         INNER JOIN forum_message m2 ON t.id = m2.thread_id
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
-        INNER JOIN forum_category c ON c.id = t.category_id";
+        INNER JOIN forum_category c ON c.id = t.category_id
+        LEFT JOIN ftr ON ftr.thread_id = t.id";
 
         $where = array();
 
         if($settings['read'] != 'all') {
-        	 $sql .= " LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id AND ftr.user_id = " . $userId;
-
+        	 $sql .= " LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id AND ftr.user_id = :read_user_id";
+        	 $input['read_user_id'] = BaseController::getLoggedInUser()->id;
         	 $where[] = 'ftr.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
         }
 
         if($settings['participated'] != 'all') {
-    		$sql .= ' LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = ' . $userId;
-
+    		$sql .= ' LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = :participated_user_id';
+			$input['participated_user_id'] = BaseController::getLoggedInUser()->id;
     		$where[] = 'm3.thread_id IS ' . ($settings['participated'] == 'yes' ? 'NOT NULL' : 'NULL');
     	}
 
         if(is_array($settings['category'])) {
         	$where[] = "c.id IN (" . implode(',', $settings['category']) . ")";
         } else if($settings['category'] != 'all') {
-        	$where[] = "c.id = " . intval($settings['category']);
+        	$where[] = "c.id = :cat_id";
+        	$input['cat_id'] = $settings['category'];
         }
 
         switch($settings['time']) {
@@ -269,7 +279,7 @@ class Thread extends BaseModel {
         	$sql .= " WHERE " . implode(" AND ", $where);
         }
 
-        $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id";
+        $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, ftr.read_percent";
         
         switch($settings['orderField']) {
         	case "first":
@@ -285,38 +295,13 @@ class Thread extends BaseModel {
 
        	$sql .= " LIMIT :limit OFFSET :offset";
 
-       	return $sql;
-	}
-
-	public static function search($settings) {
-		if($settings['category'] == 'all') {
-			$sql = 'SELECT thread_id, COUNT(*)::float / (SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read GROUP BY thread_id';
-		} else if(is_array($settings['category'])) {
-			$sql = 'SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id IN (' . implode(',', $settings['category']) . ') GROUP BY ftr.thread_id, t.category_id';
-		} else {
-			$sql = 'SELECT thread_id, COUNT(*) AS count, category_id, COUNT(*)::float/(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS percent FROM forum_thread_read ftr INNER JOIN forum_thread t ON t.id = ftr.thread_id  WHERE category_id = ' . intval($settings['category']) . ' GROUP BY ftr.thread_id, t.category_id';
-		}
-
 		$q = DB::connection()->prepare($sql);
-		$q->execute();
 
-		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-
-		$reads = array();
-		foreach($rows as $row) {
-			$reads[$row['thread_id']] = $row['percent'];
-		}
-
-		$q = DB::connection()->prepare(self::generateSql($settings));
-
-		$q->execute(array(
-			'limit' => 100,
-			'offset' => 0
-		));
+		$q->execute($input);
 
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
 		
-		return self::createThreads($rows, $reads, $settings);
+		return self::createThreads($rows, $settings);
 	}
 }
 

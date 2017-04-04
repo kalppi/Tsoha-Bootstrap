@@ -88,7 +88,12 @@ class UserController extends BaseController {
 		$user = User::find($id);
 
 		if($user) {
-			View::make('user.html', array('view_user' => $user));
+			$data = Message::allByUser($user);
+
+			View::make('user.html', array(
+				'view_user' => $user,
+				'data' => $data
+			));
 		}
 	}
 }
