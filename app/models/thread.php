@@ -248,18 +248,17 @@ class Thread extends BaseModel {
         INNER JOIN (
                 SELECT
                         thread_id,
-                        first_value(user_id) OVER w1 AS first_user_id,
-                        first_value(id) OVER w1 AS first_id,
-                        first_value(sent) OVER w1 AS first_sent,
-                        first_value(message) OVER w1 AS first_message,
-                        first_value(user_id) OVER w2 AS last_user_id,
-                        first_value(id) OVER w2 AS last_id,
-                        first_value(sent) OVER w2 AS last_sent,
-                        first_value(message) OVER w2 AS last_message
+                        first_value(user_id) OVER w AS first_user_id,
+                        first_value(id) OVER w AS first_id,
+                        first_value(sent) OVER w AS first_sent,
+                        first_value(message) OVER w AS first_message,
+                        last_value(user_id) OVER w AS last_user_id,
+                        last_value(id) OVER w AS last_id,
+                        last_value(sent) OVER w AS last_sent,
+                        last_value(message) OVER w AS last_message
                 FROM forum_message
                 WINDOW
-                        w1 AS (PARTITION BY thread_id ORDER BY sent ASC, id ASC),
-                        w2 AS (PARTITION BY thread_id ORDER BY sent DESC, id DESC)
+                        w AS (PARTITION BY thread_id ORDER BY sent ASC, id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
         ) m ON t.id = m.thread_id
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
         INNER JOIN forum_user ul ON ul.id = m.last_user_id

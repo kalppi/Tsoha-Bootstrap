@@ -89,7 +89,7 @@ BEGIN
 				thread_id,
 				parent_id,
 				random_int(1, (SELECT MAX(id) FROM forum_user)),
-				NOW() - ('1 month'::interval * t),
+				NOW() - ('1 month'::interval * t) - '3 days'::interval * random(),
 				generate_text())
 			RETURNING id, user_id INTO parent_id, msg_user_id;
 
@@ -147,4 +147,4 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 SELECT generate_users(50);
-SELECT generate_threads(50, 3, 5);
+SELECT generate_threads(200, 3, 7);
