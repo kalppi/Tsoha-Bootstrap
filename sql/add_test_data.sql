@@ -146,5 +146,5 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-SELECT generate_users(10);
-SELECT generate_threads(10, 2, 4);
+SELECT generate_users(50);
+SELECT generate_threads(50, 3, 5);

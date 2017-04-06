@@ -19,7 +19,8 @@ CREATE TABLE forum_category (
 CREATE TABLE forum_thread (
 	id SERIAL PRIMARY KEY,
 	category_id INTEGER REFERENCES forum_category (id) ON UPDATE CASCADE ON DELETE CASCADE,
-	title VARCHAR(200) NOT NULL
+	title VARCHAR(200) NOT NULL,
+	message_count INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE forum_message (
@@ -65,6 +66,33 @@ CREATE TRIGGER generate_simplename_trigger
 	FOR EACH ROW
 		EXECUTE PROCEDURE generate_simplename();
 
+CREATE OR REPLACE FUNCTION increase_message_count() RETURNS TRIGGER AS $$
+BEGIN
+	UPDATE forum_thread SET message_count = message_count + 1
+		WHERE id = NEW.thread_id;
+
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION decrease_message_count() RETURNS TRIGGER AS $$
+BEGIN
+	UPDATE forum_thread SET message_count = message_count - 1
+		WHERE id = NEW.thread_id;
+
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increase_message_count_trigger
+	AFTER INSERT ON forum_message
+	FOR EACH ROW
+		EXECUTE PROCEDURE increase_message_count();
+
+CREATE TRIGGER decrease_message_count_trigger
+	AFTER DELETE ON forum_message
+	FOR EACH ROW
+		EXECUTE PROCEDURE decrease_message_count();
 
 CREATE OR REPLACE FUNCTION move_up(tablename TEXT, moveid INTEGER) RETURNS VOID AS $$
 BEGIN

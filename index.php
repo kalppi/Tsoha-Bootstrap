@@ -28,21 +28,6 @@
   // Otetaan Composer käyttöön
   require 'vendor/autoload.php';
 
-$time = microtime(true);
-/*
-Thread::search(array(
-    'category' => 'all',
-    'orderField' => 'first',
-    'order' => 'desc',
-    'time' => 'all',
-    'read' => 'no',
-    'participated' => 'yes'
-)); 
-
-echo microtime(true) - $time;
-die();*/
-
-
   if(getenv('APPLICATION_ENV') == 'dev') {
     SassCompiler::run("assets/scss/", "assets/css/");
   }

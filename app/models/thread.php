@@ -58,7 +58,7 @@ class Thread extends BaseModel {
 
 	public function markAsRead($user) {
 		return;
-		
+
 		$q = DB::connection()->prepare(
 			'
 			WITH last_message AS (SELECT m.id FROM forum_thread t
@@ -209,6 +209,8 @@ class Thread extends BaseModel {
 	}
 
 	public static function search($settings) {
+		$userId = BaseController::getLoggedInUser()->id;
+
 		$input = array(
 			'limit' => 100,
 			'offset' => 0
@@ -236,7 +238,8 @@ class Thread extends BaseModel {
         		throw new Exception('Unknown order field (' . $settings['orderField'] . ")");
     	}
 
-        $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title, COUNT(m2.id) OVER (PARTITION BY t.id) AS t_message_count,
+        $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title,
+        t.message_count AS t_message_count,
         m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
         uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
         c.name AS c_name,
@@ -258,7 +261,6 @@ class Thread extends BaseModel {
                         w1 AS (PARTITION BY thread_id ORDER BY sent ASC, id ASC),
                         w2 AS (PARTITION BY thread_id ORDER BY sent DESC, id DESC)
         ) m ON t.id = m.thread_id
-        INNER JOIN forum_message m2 ON t.id = m2.thread_id
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
         INNER JOIN forum_user ul ON ul.id = m.last_user_id
         INNER JOIN forum_category c ON c.id = t.category_id
@@ -268,13 +270,13 @@ class Thread extends BaseModel {
 
         if($settings['read'] != 'all') {
         	 $sql .= " LEFT JOIN forum_thread_read ftr2 ON ftr2.thread_id = t.id AND ftr2.user_id = :read_user_id\n";
-        	 $input['read_user_id'] = BaseController::getLoggedInUser()->id;
+        	 $input['read_user_id'] = $userId;
         	 $where[] = 'ftr2.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
         }
 
         if($settings['participated'] != 'all') {
     		$sql .= " LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = :participated_user_id\n";
-			$input['participated_user_id'] = BaseController::getLoggedInUser()->id;
+			$input['participated_user_id'] = $userId;
     		$where[] = 'm3.thread_id IS ' . ($settings['participated'] == 'yes' ? 'NOT NULL' : 'NULL');
     	}
 
@@ -310,7 +312,7 @@ class Thread extends BaseModel {
         	$sql .= " WHERE " . implode("\n AND ", $where) . "\n";
         }
 
-        $sql .= " GROUP BY t.id, t.title, t.category_id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, uf.name, ul.name, uf.admin, ul.admin, uf.registered, ul.registered, ftr.read_percent\n";
+        $sql .= " GROUP BY t.id, t.title, t.category_id, t.message_count, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, uf.name, ul.name, uf.admin, ul.admin, uf.registered, ul.registered, ftr.read_percent\n";
         
         switch($settings['orderField']) {
         	case "first":
