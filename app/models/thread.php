@@ -5,11 +5,27 @@ class Thread extends BaseModel {
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
+
+		$this->validators = array('validateTitle');
+	}
+
+	public function validateTitle() {
+		$errors = array();
+
+		if(empty($this->title)) {
+			$errors[] = 'Otsikko ei voi olla tyhjä';
+		}  else if(strlen($this->title) < 10) {
+			$errors[] = 'Otsikon on oltava vähintään 10 merkkiä';
+		} else if(strlen($this->title) > 100) {
+			$errors[] = 'Otsikon saa olla enintään 100 merkkiä';
+		}
+
+		return $errors;
 	}
 
 	public function save() {
 		$q = DB::connection()->prepare(
-			'INSERT INTO forum_user (category_id, title) VALUES (:category_id, :title) RETURNING id'
+			'INSERT INTO forum_thread (category_id, title) VALUES (:category_id, :title) RETURNING id'
 		);
 
 		$q->execute(array(
@@ -20,6 +36,14 @@ class Thread extends BaseModel {
 		$row = $q->fetch();
 
 		$this->id = $row['id'];
+	}
+
+	public function delete() {
+		$q = DB::connection()->prepare(
+			'DELETE FROM forum_thread WHERE id = ?'
+		);
+
+		$q->execute(array($this->id));
 	}
 
 	public function hasRead($user) {
@@ -33,6 +57,8 @@ class Thread extends BaseModel {
 	}
 
 	public function markAsRead($user) {
+		return;
+		
 		$q = DB::connection()->prepare(
 			'
 			WITH last_message AS (SELECT m.id FROM forum_thread t
@@ -101,7 +127,7 @@ class Thread extends BaseModel {
 			FROM forum_thread t
 			INNER JOIN forum_category c ON c.id = t.category_id
 			WHERE t.id = :id
-			GROUP BY t.id, c.id, c.name;'
+			GROUP BY t.id, c.id, c.name, t.title'
 		);
 
 		$q->execute(array('id' => $id));
@@ -229,8 +255,8 @@ class Thread extends BaseModel {
                         first_value(message) OVER w2 AS last_message
                 FROM forum_message
                 WINDOW
-                        w1 AS (PARTITION BY thread_id ORDER BY sent ASC),
-                        w2 AS (PARTITION BY thread_id ORDER BY sent DESC)
+                        w1 AS (PARTITION BY thread_id ORDER BY sent ASC, id ASC),
+                        w2 AS (PARTITION BY thread_id ORDER BY sent DESC, id DESC)
         ) m ON t.id = m.thread_id
         INNER JOIN forum_message m2 ON t.id = m2.thread_id
         INNER JOIN forum_user uf ON uf.id = m.first_user_id
@@ -241,13 +267,13 @@ class Thread extends BaseModel {
         $where = array();
 
         if($settings['read'] != 'all') {
-        	 $sql .= " LEFT JOIN forum_thread_read ftr ON ftr.thread_id = t.id AND ftr.user_id = :read_user_id";
+        	 $sql .= " LEFT JOIN forum_thread_read ftr2 ON ftr2.thread_id = t.id AND ftr2.user_id = :read_user_id\n";
         	 $input['read_user_id'] = BaseController::getLoggedInUser()->id;
-        	 $where[] = 'ftr.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
+        	 $where[] = 'ftr2.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
         }
 
         if($settings['participated'] != 'all') {
-    		$sql .= ' LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = :participated_user_id';
+    		$sql .= " LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = :participated_user_id\n";
 			$input['participated_user_id'] = BaseController::getLoggedInUser()->id;
     		$where[] = 'm3.thread_id IS ' . ($settings['participated'] == 'yes' ? 'NOT NULL' : 'NULL');
     	}
@@ -255,8 +281,13 @@ class Thread extends BaseModel {
         if(is_array($settings['category'])) {
         	$where[] = "c.id IN (" . implode(',', $settings['category']) . ")";
         } else if($settings['category'] != 'all') {
-        	$where[] = "c.id = :cat_id";
-        	$input['cat_id'] = $settings['category'];
+        	if(is_numeric($settings['category'])) {
+        		$where[] = "c.id = :cat_id";
+        		$input['cat_id'] = $settings['category'];
+        	} else {
+        		$where[] = "c.simplename = :simplename";
+        		$input['simplename'] = $settings['category'];
+        	}
         }
 
         switch($settings['time']) {
@@ -276,10 +307,10 @@ class Thread extends BaseModel {
         }
 
         if(count($where) > 0) {
-        	$sql .= " WHERE " . implode(" AND ", $where);
+        	$sql .= " WHERE " . implode("\n AND ", $where) . "\n";
         }
 
-        $sql .= " GROUP BY t.id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, ftr.read_percent";
+        $sql .= " GROUP BY t.id, t.title, t.category_id, m2.id, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, uf.name, ul.name, uf.admin, ul.admin, uf.registered, ul.registered, ftr.read_percent\n";
         
         switch($settings['orderField']) {
         	case "first":

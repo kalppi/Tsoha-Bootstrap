@@ -10,7 +10,15 @@ class UrlGenerator {
 	public function generate($changes = array()) {
 		$values = array_merge($this->default, $changes);
 
+		$url = '';
 		$data = array();
+
+		if(isset($changes['category'])) {
+			if(!isset($this->default['category']) || $changes['category'] != $this->default['category']) {
+				$url .= 'alue/' . $changes['category'];
+				unset($changes['category']);
+			}
+		}
 
 		foreach($changes as $key => $value) {
 			if(!isset($this->default[$key]) || $changes[$key] != $this->default[$key]) {
@@ -18,7 +26,7 @@ class UrlGenerator {
 			}
 		}
 
-		return implode("&", $data);
+		return $url . (count($data) > 0 ? '?' . implode("&", $data) : '');
 	}
 }
 

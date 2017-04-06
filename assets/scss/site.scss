@@ -13,8 +13,9 @@
 	}
 }
 
-h1 {
-	font: bold 30px Volkhov;
+.jaddit {
+	font-family: Volkhov;
+	font-weight: bold;
 }
 
 .page-header {
@@ -157,14 +158,36 @@ h1 {
 	}
 
 	.category {
-		width: 130px;
+		width: 200px;
 	}
 
 	.title {
-		min-width: 250px;
+		width: 300px;
 	}
 
 	.time {
 		width: 160px;
+	}
+}
+
+#admin-cats {
+	width: 300px;
+
+	td {
+		text-align: center;
+
+		&.remove, &.up, &.down {
+			width: 30px;
+		}
+	}
+}
+
+#new-thread {
+	textarea {
+		resize: vertical;
+	}
+
+	button {
+		float: right;
 	}
 }

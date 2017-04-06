@@ -10,16 +10,16 @@
 		</h3>
 	{% endif %}
 	<div class="info">
-		<span class="name"><a href="{{base_path}}/kayttaja/{{message.user.id}}">{{message.user.name}}</a></span>
+		<span class="name"><a href="{{base_path}}/jasen/{{message.user.id}}">{{message.user.name}}</a></span>
 		<span class="time">{{message.sent|date("d.m. Y H:i:s")}}</span>
 	</div>
 	<div class="text">
-		{{message.message}}
+		{{p(message.message)|raw}}
 	</div>
 	<div class="tools">
 		{% if not is_first and not lite  %}
 			<a href="">Vastaa tähän</a>
-			<a href="{{base_path}}/viesti/{{message.id}}">Linkki</a>
+			<a href="{{base_path}}/viesti/{{message.id}}#viesti-{{message.id}}">Linkki</a>
 		{% endif %}
 	</div>
 </div>

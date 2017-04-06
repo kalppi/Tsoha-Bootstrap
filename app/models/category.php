@@ -1,7 +1,7 @@
 <?php
 
 class Category extends BaseModel {
-	public $id, $name, $thread_count;
+	public $id, $name, $simplename, $thread_count, $order;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -9,7 +9,7 @@ class Category extends BaseModel {
 
 	public function save() {
 		$q = DB::connection()->prepare(
-			'INSERT INTO forum_user (name) VALUES (:name) RETURNING id'
+			'INSERT INTO forum_category (name) VALUES (:name) RETURNING id'
 		);
 
 		$q->execute(array(
@@ -19,6 +19,14 @@ class Category extends BaseModel {
 		$row = $q->fetch();
 
 		$this->id = $row['id'];
+	}
+
+	public function delete() {
+		$q = DB::connection()->prepare(
+			'DELETE FROM forum_category WHERE id = :id'
+		);
+
+		$q->execute(array('id' => $this->id));
 	}
 
 	public static function get($id) {
@@ -45,7 +53,7 @@ class Category extends BaseModel {
 
 	public static function all() {
 		$q = DB::connection()->prepare(
-			'SELECT c.*, COUNT(t.*) AS thread_count FROM forum_category c LEFT JOIN forum_thread t ON t.category_id = c.id GROUP BY c.id ORDER BY c.id'
+			'SELECT c.*, COUNT(t.*) AS thread_count FROM forum_category c LEFT JOIN forum_thread t ON t.category_id = c.id GROUP BY c.id, c.name, c.simplename, c.order ORDER BY c.order'
 		);
 
 		$q->execute();
@@ -58,6 +66,22 @@ class Category extends BaseModel {
 		}
 
 		return $cats;
+	}
+
+	public static function moveUp($id) {
+		$q = DB::connection()->prepare("
+			SELECT move_up('forum_category', :id)
+		");
+
+		$q->execute(array('id' => $id));
+	}
+
+	public static function moveDown($id) {
+		$q = DB::connection()->prepare("
+			SELECT move_down('forum_category', :id)
+		");
+
+		$q->execute(array('id' => $id));
 	}
 }
 

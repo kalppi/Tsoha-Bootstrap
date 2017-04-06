@@ -33,6 +33,10 @@ class BaseController {
 		}
 	}
 
+	public static function checkAdmin() {
+		return self::checkLoggedIn() && self::getLoggedInUser()->admin == true;
+	}
+
 	public static function logout() {
 		if(isset($_SESSION['token'])) {
 			LoginToken::delete($_SESSION['token']);

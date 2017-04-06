@@ -34,9 +34,15 @@ class UserController extends BaseController {
 				'admin' => false
 			));
 
-			$user->save();
+			$errors = $user->errors();
 
-			View::make('joined.html');
+			if(count($errors) == 0) {
+				$user->save();
+
+				View::make('joined.html');
+			} else {
+				echo "TODO";
+			}
 		} else {
 			View::make('join.html');
 		}
@@ -79,7 +85,10 @@ class UserController extends BaseController {
 
 		$users = User::allAccepted();
 
-		View::make('users.html', array('users' => $users));
+		View::make('users.html', array(
+			'title' => 'jäsenet',
+			'users' => $users
+		));
 	}
 
 	public static function user($id) {
@@ -89,10 +98,13 @@ class UserController extends BaseController {
 
 		if($user) {
 			$data = Message::allByUser($user);
+			$stats = User::stats($user);
 
 			View::make('user.html', array(
+				'title' => sprintf('jäsen (%s)', $user->name),
 				'view_user' => $user,
-				'data' => $data
+				'data' => $data,
+				'stats' => $stats
 			));
 		}
 	}

@@ -7,7 +7,7 @@
 
     <title>
       {% block title %}
-        Keskustelufoorumi
+        jaddit {% if title %}/ {{title}}{% endif %}
       {% endblock %}
     </title>
 
@@ -29,20 +29,21 @@
             <span class="icon-bar"></span>
           </button>
 
-          <a class="navbar-brand" href="{{base_path}}">jaddit - keskustelufoorumi</a>
+          <a class="navbar-brand" href="{{base_path}}"><span class="jaddit">jaddit</span></a>
         </div>
 
         <div class="collapse navbar-collapse" id="navigation">
           <ul class="nav navbar-nav">
             {% if user %}
             <li><a href="{{base_path}}">Etusivu</a></li>
-            <li><a href="{{base_path}}/kayttaja/kaikki">Jäsenet</a></li>
+            <li><a href="{{base_path}}/jasen/kaikki">Jäsenet</a></li>
+            {% if user.admin %}<li><a href="{{base_path}}/hallinta">Hallinta</a></li>{% endif %}
             {% endif %}
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
             {% if user %}
-            <li><a href="{{base_path}}/kayttaja/{{user.id}}"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
+            <li><a href="{{base_path}}/jasen/{{user.id}}"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
             <li><a href="{{base_path}}/ulos"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
             {% endif %}
           </ul>
@@ -52,7 +53,7 @@
 
     <div id="main-container">
       <div class="page-header">
-        <h1>jaddit</h1>
+        <h1><span class="jaddit">jaddit</span> - keskustelufoorumi</h1>
       </div>
       {% block content %}{% endblock %}
     </div>

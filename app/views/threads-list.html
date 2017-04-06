@@ -1,30 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-	{% set column_sizes = [8, 4] %}
+	{{ url_format(base_path, default, settings) }}
 
-	<div class="container" id="content">
+	<div class="container-fluid" id="content">
 		<div class="row">
-			<div class="col-md-{{column_sizes[0]}}">
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras quis nunc at lacus pellentesque ornare eget et ex. Vestibulum id elit et sapien venenatis mattis. Duis eu libero ac quam dapibus tempus. Aliquam libero nulla, pellentesque id lorem non, finibus porttitor ipsum. Pellentesque a augue a metus ultrices volutpat non quis quam. Praesent viverra id mi nec aliquet. Nullam faucibus et tortor sed volutpat. Praesent quis porttitor elit.</p>
+			<div class="col-md-8">
+				<p>
+				Huom: saattaa jossakin pukata erroria, koska palvelimella on niin vanha psql versio. Ratkaisu on mietinnässä. Keskustelujen merkintä luetuksi ei myöskään siitä syystä nyt ole toiminnassa. (Hei oikeesti 8.4 julkaistiin 2009  (╯°□°）╯︵ ┻━┻)
+				</p>
+				{% for error in errors %}
+					<div class="alert alert-danger" role="alert">
+						<strong>Virhe!</strong> {{error}}!
+					</div>
+				{% endfor %}
+
+				{% if settings.category != 'all' %}
+					{% include 'partial/new-thread.html' %}
+				{% endif %}
 
 				{% include 'partial/threads-table.html' %}
 			</div>
-			<div class="col-md-{{column_sizes[1]}}">
-				<div class="container" id="filter-options">
+			<div class="col-md-4">
+				<div class="container-fluid" id="filter-options">
 					<div class="row">
-						<div class="col-md-{{column_sizes[1]}}">
-							<h5>Alueet</h5>
+						<div class="col-md-12">
+							<h5>Alue</h5>
 
 							<div id="categories">
 								<ul>
-									{{
-										url_format(base_path, default, settings)
-									}}
-
 									{% for cat in settingsInfo.category %}
-										<li class="{% if settings.category == cat.id %}selected{% endif %}">
-											<a href="{{  url({category: cat.id}) }}">{{cat.name}}</a>
+										<li class="{% if settings.category == cat.simplename %}selected{% endif %}">
+											<a href="{{  url({category: cat.simplename}) }}">{{cat.name}}</a>
 										</li>	
 									{% endfor %}
 								</ul>
@@ -32,7 +39,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-{{column_sizes[1]}}">
+						<div class="col-md-12">
 							<h5>Aloituksen ikä</h5>
 
 							<ul>
@@ -45,7 +52,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-{{column_sizes[1]}}">
+						<div class="col-md-12">
 							<h5>Järjestys</h5>
 
 							<ul>
@@ -68,7 +75,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-{{column_sizes[1]}}">
+						<div class="col-md-12">
 							<h5>Itse lukenut</h5>
 
 							<ul>
@@ -81,7 +88,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-md-{{column_sizes[1]}}">
+						<div class="col-md-12">
 							<h5>Itse osallistunut</h5>
 
 							<ul>

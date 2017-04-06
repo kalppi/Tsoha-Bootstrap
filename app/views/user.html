@@ -3,11 +3,34 @@
 {% block content %}
 	<h3>Käyttäjä: {{view_user.name}}</h3>
 	<table class="table" id="user-info">
+		{% if user.admin %}
+			<tr>
+				<td>Sähköposti</td><td>{{view_user.email}}</td>
+			</tr>
+		{% endif %}
 		<tr>
 			<td>Rekisteröitynyt</td><td>{{view_user.registered|date('d.m. Y')}}</td>
 		</tr>
 		<tr>
 			<td>Ylläpitäjä</td><td>{{view_user.admin ? 'Kyllä' : 'Ei'}}</td>
+		</tr>
+		<tr>
+			<td>Viestejä</td>
+			<td>
+				{{stats.message_count ? stats.message_count : 0}}
+				{% if stats.message_count > 0 %}
+					({{(stats.message_percent * 100)|round(1)}}% kaikista)
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td>Ketjun aloituksia</td>
+			<td>
+				{{stats.start_count ? stats.start_count : 0}}
+				{% if stats.start_count > 0 %}
+					({{(stats.start_percent * 100)|round(1)}}% kaikista)
+				{% endif %}
+			</td>
 		</tr>
 	</table>
 

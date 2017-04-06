@@ -17,9 +17,26 @@
       }));
 
       $twig->addFunction(new Twig_SimpleFunction('url', function($changes) use (&$url_base, &$url_default, &$url_values) {
+
         $generator = new UrlGenerator($url_default);
-        return $url_base ."/?". $generator->generate(array_merge($url_values, $changes));
+        $url = $url_base . "/";
+
+        /*if(isset($changes['category'])) {
+          $url .= 'alue/' . ($changes['category'] == 'all' ? 'kaikki' : $changes['category']);
+          unset($changes['category']);
+          unset($url_values['category']);
+        }*/
+
+        $url .= $generator->generate(array_merge($url_values, $changes));
+        
+
+        return $url;
       }));
+
+      $twig->addFunction(new Twig_SimpleFunction('p', function($text) {
+        return '<p>' . str_replace("\n", '</p><p>', trim($text)) . '</p>';
+      }));
+
 
       try{
         // Asetetaan uudelleenohjauksen yhteydessä lisätty viesti

@@ -1,7 +1,23 @@
 <?php
 
 $routes->get('/', function() {
-	CategoryController::list();
+	CategoryController::view();
+});
+
+$routes->get('/alue/:id', function($id) {
+	CategoryController::view($id);
+});
+
+$routes->post('/ketju/uusi', function() {
+	ThreadController::createNew();
+});
+
+$routes->get('/hallinta', function() {
+	AdminController::index();
+});
+
+$routes->post('/hallinta', function() {
+	AdminController::index();
 });
 
 $routes->get('/uusi-viesti', function() {
@@ -16,15 +32,15 @@ $routes->get('/viesti/:id', function($id) {
 	MessageController::view($id);
 });
 
-$routes->get('/kayttaja/kaikki', function() {
+$routes->get('/jasen/kaikki', function() {
 	UserController::all();
 });
 
-$routes->get('/kayttaja/uusi', function() {
+$routes->get('/jasen/uusi', function() {
 	UserController::join();
 });
 
-$routes->post('/kayttaja/uusi', function() {
+$routes->post('/jasen/uusi', function() {
 	UserController::join();
 });
 
@@ -40,10 +56,10 @@ $routes->post('/kirjaudu', function() {
 	UserController::login();
 });
 
-$routes->get('/kayttaja', function() {
+$routes->get('/jasen', function() {
 	UserController::index();
 });
 
-$routes->get('/kayttaja/:id', function($id) {
+$routes->get('/jasen/:id', function($id) {
 	UserController::user($id);
 });

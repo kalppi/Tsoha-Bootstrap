@@ -9,3 +9,5 @@ class MainController extends BaseController {
 		View::make('thread.html');
 	}
 }
+
+?>

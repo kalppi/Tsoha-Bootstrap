@@ -5,18 +5,33 @@ class Message extends BaseModel {
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
+
+		$this->validators = array('validateMessage');
+	}
+
+	public function validateMessage() {
+		$errors = array();
+
+		if(empty($this->message)) {
+			$errors[] = 'Viesti ei voi olla tyhjä';
+		} else if(strlen($this->message) < 10) {
+			$errors[] = 'Viestin on oltava vähintään 10 merkkiä';
+		} else if(strlen($this->message) > 2000) {
+			$errors[] = 'Viesti saa olal enintään 2000 merkkiä';
+		}
+
+		return $errors;
 	}
 
 	public function save() {
 		$q = DB::connection()->prepare(
-			'INSERT INTO forum_user (thread_id, parent_id, user_id, sent, message) VALUES (:thread_id, :parent_id, :user_id, :sent, :message) RETURNING id'
+			'INSERT INTO forum_message (thread_id, parent_id, user_id, message) VALUES (:thread_id, :parent_id, :user_id, :message) RETURNING id'
 		);
 
 		$q->execute(array(
 			'thread_id' => $this->thread_id,
 			'parent_id' => $this->parent_id,
 			'user_id' => $this->user->id,
-			'sent' => $this->sent,
 			'message' => $this->message
 		));
 
@@ -131,7 +146,7 @@ class Message extends BaseModel {
 				WINDOW w1 AS (PARTITION BY m.thread_id ORDER BY sent ASC)
 			) m2 ON m2.thread_id = t.id
 			WHERE m.user_id = :user_id
-			GROUP BY m.thread_id, m.id, t.id, c.id, c.name, m2.id, m2.user_id
+			GROUP BY m.thread_id, m.id, t.id, t.title, c.id, c.name, m2.id, m2.user_id, m.sent, m.message
 			ORDER BY m.sent DESC'
 		);
 
@@ -150,7 +165,7 @@ class Message extends BaseModel {
 	public static function allInThread($id) {
 		$q = DB::connection()->prepare(
 			'WITH RECURSIVE messages_path AS (
-				(SELECT id, user_id, sent, parent_id, message, ARRAY[id]::INTEGER[] AS path, 1 AS depth
+				(SELECT id, user_id, sent, parent_id, message, ARRAY[id]::INTEGER[] AS path, 0 AS depth
 				FROM forum_message WHERE parent_id IS NULL AND thread_id = :thread_id)
 
 				UNION ALL
@@ -161,7 +176,7 @@ class Message extends BaseModel {
 			) SELECT m.id, m.sent, m.message, m.depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
 				FROM messages_path m
 				INNER JOIN forum_user u ON m.user_id = u.id
-				ORDER BY path ASC, sent ASC'
+				ORDER BY path ASC, sent ASC, id ASC'
 		);
 
 		$q->execute(array('thread_id' => $id));

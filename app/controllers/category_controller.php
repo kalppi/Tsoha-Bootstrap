@@ -1,13 +1,14 @@
 <?php
 
 class CategoryController extends BaseController {
-	public static function list() {
+	public static function view($cat = 'all') {
 		parent::checkLoggedIn();
 
 		$cats = Category::all();
 		array_unshift($cats, new Category(array(
 			'id' => 'all',
 			'name' => 'Kaikki',
+			'simplename' => 'all',
 			'thread_count' => Category::threadCount()
 		)));
 
@@ -22,6 +23,8 @@ class CategoryController extends BaseController {
 
 		$settings = $default;
 
+		$settings['category'] = $cat;
+
 		foreach(array_keys($default) as $k) {
 			if(isset($_GET[$k])) {
 				$settings[$k] = $_GET[$k];
@@ -31,6 +34,8 @@ class CategoryController extends BaseController {
 		$threads = Thread::search($settings);
 
 		View::make('threads-list.html', array(
+			'url' => $_SERVER['QUERY_STRING'],
+			'title' => 'keskustelu',
 			'threads' => $threads,
 			'default' => $default,
 			'settings' => $settings,

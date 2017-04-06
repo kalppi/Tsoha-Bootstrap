@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Hallinta</h3>
+
+<form method="post" action="{{base_path}}/hallinta">
+
+<table class="table" id="admin-cats">
+{% for cat in cats %}
+	<tr>
+		<td class="remove">
+			<a href="{{base_path}}/hallinta?delete={{cat.id}}"><span class="glyphicon glyphicon-remove"></span></a>
+		</td>
+		<td class="up">
+			{% if not loop.first %}
+				<a href="{{base_path}}/hallinta?move-up={{cat.id}}"><span class="glyphicon glyphicon-chevron-up"></span></a>
+			{% endif %}
+		</td>
+		<td>{{cat.name}}</td>
+		<td class="down">
+			{% if not loop.last %}
+				<a href="{{base_path}}/hallinta?move-down={{cat.id}}"><span class="glyphicon glyphicon-chevron-down"></span></a>
+			{% endif %}
+		</td>
+	</tr>
+{% endfor %}
+	<tr>
+		<td></td>
+		<td></td>
+		<td>
+			<input class="form-control" type="text" name="cat-name" />
+		</td>
+		<td>
+			<button class="btn btn-primary glyphicon glyphicon-plus-sign"></button>
+		</td>
+	</tr>
+</table>
+
+</form>
+
+{% endblock %}
