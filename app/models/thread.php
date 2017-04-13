@@ -57,8 +57,6 @@ class Thread extends BaseModel {
 	}
 
 	public function markAsRead($user) {
-		return;
-
 		$q = DB::connection()->prepare(
 			'
 			WITH last_message AS (SELECT m.id FROM forum_thread t
@@ -212,7 +210,7 @@ class Thread extends BaseModel {
 		$userId = BaseController::getLoggedInUser()->id;
 
 		$input = array(
-			'limit' => 100,
+			'limit' => 10,
 			'offset' => 0
 		);
 

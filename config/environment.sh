@@ -1,6 +1,7 @@
 #!/bin/bash
 
-USERNAME="jarnoluu"
-SERVER="localhost"
-PORT=9922
+USERNAME="jarno"
+SERVER="jarnoluu.com"
+PORT=22
 PROJECT_FOLDER="tsoha"
+REMOTE_DIR="public_html"

@@ -3,7 +3,7 @@
 
 ## Yleisiä linkkejä:
 
-* [Linkki sovellukseeni](http://jarnoluu.users.cs.helsinki.fi/tsoha/)
+* [Linkki sovellukseeni](http://jarnoluu.com/tsoha/)
 * [Linkki dokumentaatiooni](https://raw.githubusercontent.com/kalppi/Tsoha-keskustelufoorumi/master/doc/dokumentaatio.pdf)
 
 ## Työn aihe
@@ -12,9 +12,9 @@
 
 ## Sivut
 
-* [Etusivu](http://jarnoluu.users.cs.helsinki.fi/tsoha/)
-* [Liittyminen](http://jarnoluu.users.cs.helsinki.fi/tsoha/kayttaja/uusi)
-* [Kaikki käyttäjät](http://jarnoluu.users.cs.helsinki.fi/tsoha/jasen/kaikki)
+* [Etusivu](http://jarnoluu.com/tsoha/)
+* [Liittyminen](http://jarnoluu.com/tsoha/kayttaja/uusi)
+* [Kaikki käyttäjät](http://jarnoluu.com/tsoha/jasen/kaikki)
 
 ## Testikäyttäjät
 

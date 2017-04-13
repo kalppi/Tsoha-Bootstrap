@@ -6,38 +6,32 @@
 	<div class="container-fluid" id="content">
 		<div class="row">
 			<div class="col-md-8">
-				<p>
-				Huom: saattaa jossakin pukata erroria, koska palvelimella on niin vanha psql versio. Ratkaisu on mietinnässä. Keskustelujen merkintä luetuksi ei myöskään siitä syystä nyt ole toiminnassa. (Hei oikeesti 8.4 julkaistiin 2009  (╯°□°）╯︵ ┻━┻)
-				</p>
 				{% for error in errors %}
 					<div class="alert alert-danger" role="alert">
 						<strong>Virhe!</strong> {{error}}!
 					</div>
 				{% endfor %}
 
+				<div id="categories">
+					<h5>Alue</h5>
+
+					<ul>
+						{% for cat in settingsInfo.category %}
+							<li class="{% if settings.category == cat.simplename %}selected{% endif %}">
+								<a href="{{  url({category: cat.simplename}) }}">{{cat.name}}</a>
+							</li>	
+						{% endfor %}
+					</ul>
+				</div>
+
 				{% if settings.category != 'all' %}
 					{% include 'partial/new-thread.html' %}
 				{% endif %}
-
+				
 				{% include 'partial/threads-table.html' %}
 			</div>
 			<div class="col-md-4">
 				<div class="container-fluid" id="filter-options">
-					<div class="row">
-						<div class="col-md-12">
-							<h5>Alue</h5>
-
-							<div id="categories">
-								<ul>
-									{% for cat in settingsInfo.category %}
-										<li class="{% if settings.category == cat.simplename %}selected{% endif %}">
-											<a href="{{  url({category: cat.simplename}) }}">{{cat.name}}</a>
-										</li>	
-									{% endfor %}
-								</ul>
-							</div>
-						</div>
-					</div>
 					<div class="row">
 						<div class="col-md-12">
 							<h5>Aloituksen ikä</h5>

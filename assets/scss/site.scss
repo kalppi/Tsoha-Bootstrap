@@ -66,6 +66,21 @@
 	}
 }
 
+#categories {
+	background: #efefef;
+	padding: 10px;
+	margin-bottom: 20px;
+
+	h5 {
+		width: 100px;
+		float: left;
+		text-align: center;
+	}
+
+	ul {
+		margin: 0 0 0 100px;
+	}
+}
 
 #filter-options {
 	margin-bottom: 30px;
@@ -78,7 +93,9 @@
 	h5 {
 		margin: 0 0 3px 0;
 	}
+}
 
+#categories, #filter-options {
 	ul {
 		list-style-type: none;
 		padding: 0;
