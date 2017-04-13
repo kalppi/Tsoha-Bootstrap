@@ -40,7 +40,7 @@ class ThreadController extends BaseController {
 			if(count($errors) == 0) {
 				$message->save();
 
-				Redirect::to(sprintf('/ketju/%s#viesti-%s', $threadId, $parentId));
+				Redirect::to(sprintf('/ketju/%s#viesti-%s', $threadId, $message->id));
 			} else {
 				if($thread->firstMessage()->id == $parentId) {
 					$url = sprintf('/ketju/%s#viesti-%s', $threadId, $parentId);
