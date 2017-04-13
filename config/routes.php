@@ -1,65 +1,30 @@
 <?php
 
-$routes->get('/', function() {
-	CategoryController::view();
-});
+$get = array(
+	'/' => 'CategoryController::view',
+	'/alue/:id' => 'CategoryController::view',
+	'/ketju/uusi' => 'ThreadController::createNew',
+	'/hallinta' => 'AdminController::index',
+	'/ketju/:id' => 'ThreadController::view',
+	'/viesti/:id' => 'MessageController::view',
+	'/jasen/kaikki' => 'UserController::all',
+	'/jasen/uusi' => 'UserController::join',
+	'/kirjaudu' => 'UserController::login',
+	'/ulos' => 'UserController::logout',
+	'/jasen' => 'UserController::index',
+	'/jasen/:id' => 'UserController::user'
+);
 
-$routes->get('/alue/:id', function($id) {
-	CategoryController::view($id);
-});
+$post = array(
+	'/hallinta' => 'AdminController::index',
+	'/jasen/uusi' => 'UserController::join',
+	'/kirjaudu' => 'UserController::login'
+);
 
-$routes->post('/ketju/uusi', function() {
-	ThreadController::createNew();
-});
+foreach($get as $route => $f) {
+	$routes->get($route, $f);
+}
 
-$routes->get('/hallinta', function() {
-	AdminController::index();
-});
-
-$routes->post('/hallinta', function() {
-	AdminController::index();
-});
-
-$routes->get('/uusi-viesti', function() {
-	MainController::newMessage();
-});
-
-$routes->get('/ketju/:id', function($id) {
-	ThreadController::view($id);
-});
-
-$routes->get('/viesti/:id', function($id) {
-	MessageController::view($id);
-});
-
-$routes->get('/jasen/kaikki', function() {
-	UserController::all();
-});
-
-$routes->get('/jasen/uusi', function() {
-	UserController::join();
-});
-
-$routes->post('/jasen/uusi', function() {
-	UserController::join();
-});
-
-$routes->get('/kirjaudu', function() {
-	UserController::login();
-});
-
-$routes->get('/ulos', function() {
-	UserController::logout();
-});
-
-$routes->post('/kirjaudu', function() {
-	UserController::login();
-});
-
-$routes->get('/jasen', function() {
-	UserController::index();
-});
-
-$routes->get('/jasen/:id', function($id) {
-	UserController::user($id);
-});
+foreach($get as $route => $f) {
+	$routes->post($route, $f);
+}
