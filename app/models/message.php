@@ -101,7 +101,7 @@ class Message extends BaseModel {
 				(SELECT m.id, m.user_id, m.sent, m.parent_id, m.message, mp.path || m.id, depth + 1 AS depth
 				FROM forum_message m, messages_path mp
 				WHERE m.parent_id = mp.id)
-			) SELECT m.id, m.sent, m.message, depth - array_position(path, :message_id) + 1 AS depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
+			) SELECT m.id, m.sent AT TIME ZONE \'Europe/Helsinki\' AS sent, m.message, depth - array_position(path, :message_id) + 1 AS depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
 				FROM messages_path m
 				INNER JOIN forum_user u ON m.user_id = u.id
 				WHERE :message_id = ANY (path)
@@ -130,7 +130,7 @@ class Message extends BaseModel {
 
 	public static function allByUser($user) {
 		$q = DB::connection()->prepare(
-			'SELECT m.id AS m_id, t.id AS t_id, t.title t_title, c.id AS c_id, c.name AS c_name, m.sent AS m_sent,
+			'SELECT m.id AS m_id, t.id AS t_id, t.title t_title, c.id AS c_id, c.name AS c_name, m.sent AT TIME ZONE \'Europe/Helsinki\' AS m_sent,
 			m2.id = m.id AS t_is_start,
 			CASE WHEN length(m.message) > :max_length
 				THEN substring(m.message from 1 for :max_length) || \'...\'
@@ -173,7 +173,7 @@ class Message extends BaseModel {
 				(SELECT m.id, m.user_id, m.sent, m.parent_id, m.message, mp.path || m.id, depth + 1 AS depth
 				FROM forum_message m, messages_path mp
 				WHERE m.parent_id = mp.id)
-			) SELECT m.id, m.sent, m.message, m.depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
+			) SELECT m.id, m.sent AT TIME ZONE \'Europe/Helsinki\' AS sent, m.message, m.depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
 				FROM messages_path m
 				INNER JOIN forum_user u ON m.user_id = u.id
 				ORDER BY path ASC, sent ASC, id ASC'
