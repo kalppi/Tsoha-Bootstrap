@@ -121,7 +121,7 @@ class Thread extends BaseModel {
 		$q = DB::connection()->prepare(
 			'SELECT
 				t.id, t.title,
-				c.id AS c_id, c.name AS c_name
+				c.id AS c_id, c.name AS c_name, c.simplename AS c_simplename
 			FROM forum_thread t
 			INNER JOIN forum_category c ON c.id = t.category_id
 			WHERE t.id = :id
@@ -133,7 +133,8 @@ class Thread extends BaseModel {
 
 		$cat = new Category(array(
 			'id' => $row['c_id'],
-			'name' => $row['c_name']
+			'name' => $row['c_name'],
+			'simplename' => $row['c_simplename']
 		));
 
 		$row['category'] = $cat;

@@ -23,6 +23,12 @@
 	padding-bottom: 0;
 }
 
+@for $i from 2 through 10 {
+	&.level-#{$i} {
+		margin-left: #{$i * 30 - 30}px;
+	}
+}
+
 .thread-message {
 	border: 1px solid #ddd;
 	padding: 10px;
@@ -36,12 +42,6 @@
 		margin: 8px 0 12px 0;
 		font-size: 20px;
 		font-weight: bold;
-	}
-
-	@for $i from 2 through 10 {
-		&.level-#{$i} {
-			margin-left: #{$i * 30 - 30}px;
-		}
 	}
 
 	.info {

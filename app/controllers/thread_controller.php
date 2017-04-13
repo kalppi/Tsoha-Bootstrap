@@ -1,7 +1,7 @@
 <?php
 
 class ThreadController extends BaseController {
-	public static function view($id) {
+	public static function view($id, $replyId = null) {
 		parent::checkLoggedIn();
 
 		$thread = Thread::get($id);
@@ -15,8 +15,48 @@ class ThreadController extends BaseController {
 			'title' => 'keskustelu: ' . $thread->title,
 			'thread' => $thread,
 			'messages' => $messages,
-			'message' => $first
+			'message' => $first,
+			'replyId' => $replyId
 		));	
+	}
+
+	public static function reply($id, $mId) {
+		if(isset($_POST['form-submit'])) {
+			$threadId = isset($_POST['form-thread']) ? $_POST['form-thread'] : null;
+			$parentId = isset($_POST['form-parent']) ? $_POST['form-parent'] : null;
+			$msg = isset($_POST['form-message']) ? $_POST['form-message'] : null;
+
+			$thread = Thread::get($threadId);
+
+			$message = new Message(array(
+				'thread_id' => $threadId,
+				'user' => self::getLoggedInUser(),
+				'parent_id' => $parentId,
+				'message' => $msg
+			));
+
+			$errors = $message->errors();
+
+			if(count($errors) == 0) {
+				$message->save();
+
+				Redirect::to(sprintf('/ketju/%s#viesti-%s', $threadId, $parentId));
+			} else {
+				if($thread->firstMessage()->id == $parentId) {
+					$url = sprintf('/ketju/%s#viesti-%s', $threadId, $parentId);
+				} else {
+					$url = sprintf('/ketju/%s/vastaa/%s#viesti-%s', $threadId, $parentId, $parentId);
+				}
+
+				Redirect::to($url, array(
+					'form_message' => $msg,
+					'errors' => $errors,
+					'parent_id' => $parentId
+				));
+			}
+		} else {
+			self::view($id, $mId);
+		}
 	}
 
 	public static function createNew() {

@@ -4,7 +4,7 @@
 		<h3 class="title">
 			<a href="{{base_path}}">Keskustelu</a>
 			/
-			<a href="{{base_path}}/?category={{thread.category.id}}">{{thread.category.name}}</a>
+			<a href="{{base_path}}/?category={{thread.category.simplename}}">{{thread.category.name}}</a>
 			/
 			<a href="{{base_path}}/ketju/{{thread.id}}">{{thread.title}}</a>
 		</h3>
@@ -18,8 +18,25 @@
 	</div>
 	<div class="tools">
 		{% if not is_first and not lite  %}
-			<a href="">Vastaa tähän</a>
+			{% if replyId != message.id %}
+				<a href="{{base_path}}/ketju/{{thread.id}}/vastaa/{{message.id}}#viesti-{{message.id}}">Vastaa tähän</a>
+			{% endif %}
 			<a href="{{base_path}}/viesti/{{message.id}}#viesti-{{message.id}}">Linkki</a>
 		{% endif %}
 	</div>
 </div>
+
+{% if replyId == message.id %}
+	<div class="level-{{message.depth + additional_depth}}">
+
+		{% if parent_id == message.id %}
+			{% for error in errors %}
+				<div class="alert alert-danger" role="alert">
+					<strong>Virhe!</strong> {{error}}!
+				</div>
+			{% endfor %}
+		{% endif %}
+
+		{% include 'partial/reply-form.html' with { reply_id: message.id, focus: true } %}
+	</div>
+{% endif %}

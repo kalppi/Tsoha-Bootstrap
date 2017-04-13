@@ -41,7 +41,9 @@ function makePie(canvas, percent, r, read) {
 	}
 }
 
-$(document).ready(function(){
+$(document).ready(function() {
+	$('textarea.focus').focus();
+
 	$('.read-percent').each((function() {
 		var percent = $(this).data('percent');
 		var size = $(this).data('size');

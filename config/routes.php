@@ -6,6 +6,7 @@ $get = array(
 	'/ketju/uusi' => 'ThreadController::createNew',
 	'/hallinta' => 'AdminController::index',
 	'/ketju/:id' => 'ThreadController::view',
+	'/ketju/:id/vastaa/:mid' => 'ThreadController::reply',
 	'/viesti/:id' => 'MessageController::view',
 	'/jasen/kaikki' => 'UserController::all',
 	'/jasen/uusi' => 'UserController::join',
@@ -18,7 +19,8 @@ $get = array(
 $post = array(
 	'/hallinta' => 'AdminController::index',
 	'/jasen/uusi' => 'UserController::join',
-	'/kirjaudu' => 'UserController::login'
+	'/kirjaudu' => 'UserController::login',
+	'/ketju/:id/vastaa/:mid' => 'ThreadController::reply'
 );
 
 foreach($get as $route => $f) {

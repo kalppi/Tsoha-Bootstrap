@@ -6,7 +6,15 @@
 			<div class="col-md-8">
 				{% include 'partial/message.html' with {is_first: true } %}
 
-				{% include 'partial/reply-form.html' %}
+				{% if parent_id == message.id %}
+					{% for error in errors %}
+						<div class="alert alert-danger" role="alert">
+							<strong>Virhe!</strong> {{error}}!
+						</div>
+					{% endfor %}
+				{% endif %}
+
+				{% include 'partial/reply-form.html' with { reply_id: message.id } %}
 
 				{% for message in messages %}
 					{% include 'partial/message.html' %}

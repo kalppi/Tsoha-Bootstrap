@@ -1,9 +1,12 @@
-<form action="">
+<form action="{{base_path}}/ketju/{{thread.id}}/vastaa/{{reply_id}}" method="post">
 	<input type="hidden" name="form-thread" value="{{thread.id}}" />
-	<input type="hidden" name="form-parent" value="{{message.parent_id}}" />
+	<input type="hidden" name="form-parent" value="{{reply_id}}" />
 
 	<div class="form-group">
 		<label for="form-message">Viesti</label>
-		<textarea class="form-control" id="form-message" rows="5"></textarea>
+		<textarea class="form-control {% if focus %}focus{% endif %}" id="form-message" name="form-message" rows="5">{{form_message}}</textarea>
+	</div>
+	<div class="form-group">
+		<button class="btn btn-primary" name="form-submit">Vastaa</button>
 	</div>
 </form>
