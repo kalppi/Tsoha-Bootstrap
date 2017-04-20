@@ -5,23 +5,28 @@ class MessageController extends BaseController {
 		parent::checkLoggedIn();
 
 		$message = Message::get($id);
-		$thread = Thread::get($message->thread_id);
-		$first = $thread->firstMessage();
 
-		$messages = $message->withChildren();
+		if($message) {
+			$thread = Thread::get($message->thread_id);
+			$first = $thread->firstMessage();
 
-		$parent = null;
-		if($message->parent_id != null) {
-			$parent = $message->getParent();
-			array_unshift($messages, $parent);
+			$messages = $message->withChildren();
+
+			$parent = null;
+			if($message->parent_id != null) {
+				$parent = $message->getParent();
+				array_unshift($messages, $parent);
+			}
+
+			View::make('message.html', array(
+				'thread' => $thread,
+				'message' => $first,
+				'parent' => $parent,
+				'messages' => $messages,
+				'hilight_id' => $id
+			));
+		} else {
+			ErrorController::error('viestiä ei löydy');
 		}
-
-		View::make('message.html', array(
-			'thread' => $thread,
-			'message' => $first,
-			'parent' => $parent,
-			'messages' => $messages,
-			'hilight_id' => $id
-		));	
 	}
 }

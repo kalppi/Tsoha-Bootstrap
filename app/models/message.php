@@ -54,6 +54,8 @@ class Message extends BaseModel {
 		$q->execute(array('id' => $id));
 		$row = $q->fetch(PDO::FETCH_ASSOC);
 
+		if(!$row) return null;
+
 		$user = new User(array(
 			'id' => $row['u_id'],
 			'name' => $row['u_name'],
@@ -130,7 +132,7 @@ class Message extends BaseModel {
 
 	public static function allByUser($user) {
 		$q = DB::connection()->prepare(
-			'SELECT m.id AS m_id, t.id AS t_id, t.title t_title, c.id AS c_id, c.name AS c_name, m.sent AT TIME ZONE \'Europe/Helsinki\' AS m_sent,
+			'SELECT m.id AS m_id, t.id AS t_id, t.title t_title, c.id AS c_id, c.name AS c_name, c.simplename AS c_simplename, m.sent AT TIME ZONE \'Europe/Helsinki\' AS m_sent,
 			m2.id = m.id AS t_is_start,
 			CASE WHEN length(m.message) > :max_length
 				THEN substring(m.message from 1 for :max_length) || \'...\'

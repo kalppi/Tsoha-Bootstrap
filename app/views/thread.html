@@ -14,7 +14,9 @@
 					{% endfor %}
 				{% endif %}
 
-				{% include 'partial/reply-form.html' with { reply_id: message.id } %}
+				{% if user %}
+					{% include 'partial/reply-form.html' with { reply_id: message.id } %}
+				{% endif %}
 
 				{% for message in messages %}
 					{% include 'partial/message.html' %}

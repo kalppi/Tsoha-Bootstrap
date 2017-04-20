@@ -2,8 +2,11 @@
 
 class CategoryController extends BaseController {
 	public static function view($cat = 'all') {
-		parent::checkLoggedIn();
-
+		if($cat !== 'all' && !Category::exists($cat)) {
+			ErrorController::error('virheellinen kategoria');
+			return;
+		}
+ 
 		$cats = Category::all();
 		array_unshift($cats, new Category(array(
 			'id' => 'all',
@@ -31,7 +34,18 @@ class CategoryController extends BaseController {
 			}
 		}
 
-		$threads = Thread::search($settings);
+		$threads = null;
+
+		try {
+			$threads = Thread::search($settings);
+		} catch (Exception $e) {
+			if($e instanceof PDOException) {
+				echo "#";
+			} else {
+				ErrorController::error('virheellinen hakuparametri');
+			}
+			return;
+		}
 
 		View::make('threads-list.html', array(
 			'url' => $_SERVER['QUERY_STRING'],

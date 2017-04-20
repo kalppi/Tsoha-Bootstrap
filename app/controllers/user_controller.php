@@ -22,26 +22,44 @@ class UserController extends BaseController {
 	}
 
 	public static function join() {
-		if(isset($_POST['password'])) {
-			$pw = $_POST['password'];
+		if(isset($_POST['join-submit'])) {
+			if(strlen($_POST['login-other']) > 0) {
+				die();
+			}
+
+			$name = trim($_POST['join-name']);
+			$email = trim($_POST['join-email']);
+			$pw = $_POST['join-password'];
+			$pw2 = $_POST['join-password2'];
+
+			
 			$hash = self::hashPassword($pw);
 
 			$user = new User(array(
-				'name' => $_POST['name'],
-				'email' => $_POST['email'],
+				'name' => $name,
+				'email' => $email,
 				'hash' => $hash,
-				'accepted' => false,
 				'admin' => false
 			));
 
 			$errors = $user->errors();
 
+			if (strlen($pw) < 8) {
+				$errors[] = 'Salasanan pitää olla vähintään 8 merkkiä';
+			} else if($pw != $pw2) {
+				$errors[] = 'Salasanat eivät täsmänneet';
+			}
+
 			if(count($errors) == 0) {
 				$user->save();
 
-				View::make('joined.html');
+				Redirect::to('/');
 			} else {
-				echo "TODO";
+				View::make('join.html', array(
+					'join_name' => $name,
+					'join_email' => $email,
+					'errors' => $errors
+				));
 			}
 		} else {
 			View::make('join.html');
@@ -49,15 +67,18 @@ class UserController extends BaseController {
 	}
 
 	public static function login() {
-		if(isset($_POST['email']) && isset($_POST['password'])) {
-			$email = $_POST['email'];
-			$pw = $_POST['password'];
-			$remember = isset($_POST['remember']) ? boolval($_POST['remember']) : false;
+		if(isset($_POST['login-submit'])) {
+			$email = $_POST['login-email'];
+			$pw = $_POST['login-password'];
+			$remember = isset($_POST['login-remember']) ? boolval($_POST['login-remember']) : false;
 
 			$user = User::findBy('email', $email);
 
-			$err = function() {
-				Redirect::to('/kirjaudu', array('error' => 'Virheellinen käyttäjätunnus tai salasana'));
+			$err = function() use($email) {
+				Redirect::to('/kirjaudu', array(
+					'login_email' => $email,
+					'error' => 'Virheellinen sähköposti tai salasana'
+				));
 			};
 
 			if(!$user) {
@@ -83,7 +104,7 @@ class UserController extends BaseController {
 	public static function all() {
 		self::checkLoggedIn();
 
-		$users = User::allAccepted();
+		$users = User::all();
 
 		View::make('users.html', array(
 			'title' => 'jäsenet',
@@ -106,6 +127,8 @@ class UserController extends BaseController {
 				'data' => $data,
 				'stats' => $stats
 			));
+		} else {
+			ErrorController::error('käyttäjää ei löydy');
 		}
 	}
 }

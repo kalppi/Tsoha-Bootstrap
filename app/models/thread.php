@@ -57,6 +57,10 @@ class Thread extends BaseModel {
 	}
 
 	public function markAsRead($user) {
+		if(!$user) {
+			return;
+		}
+
 		$q = DB::connection()->prepare(
 			'
 			WITH last_message AS (SELECT m.id FROM forum_thread t
@@ -108,7 +112,7 @@ class Thread extends BaseModel {
 	public function getReadPercent() {
 		$q = DB::connection()->prepare(
 			'SELECT COUNT(*)::float /
-				(SELECT COUNT(*) FROM forum_user WHERE accepted = TRUE)
+				(SELECT COUNT(*) FROM forum_user)
 			FROM forum_thread_read WHERE thread_id = :thread_id'
 		);
 
@@ -130,6 +134,8 @@ class Thread extends BaseModel {
 
 		$q->execute(array('id' => $id));
 		$row = $q->fetch(PDO::FETCH_ASSOC);
+
+		if(!$row) return null;
 
 		$cat = new Category(array(
 			'id' => $row['c_id'],
@@ -180,7 +186,8 @@ class Thread extends BaseModel {
 				'id' => $row['t_id'],
 				'category' => new Category(array(
 					'id' => $row['t_category_id'],
-					'name' => $row['c_name']
+					'name' => $row['c_name'],
+					'simplename' => $row['c_simplename']
 				)),
 				'title' => $row['t_title'],
 				'message_count' => $row['t_message_count'],
@@ -208,7 +215,13 @@ class Thread extends BaseModel {
 	}
 
 	public static function search($settings) {
-		$userId = BaseController::getLoggedInUser()->id;
+		$user = BaseController::getLoggedInUser();
+
+		if($user) {
+			$userId = $user->id;
+		} else {
+			$userId = null;
+		}
 
 		$input = array(
 			'limit' => 10,
@@ -216,7 +229,7 @@ class Thread extends BaseModel {
 		);
 
 		$sql = 'WITH ftr AS (SELECT thread_id, COUNT(*)::float /
-				(SELECT COUNT(*) FROM forum_user WHERE accepted=TRUE) AS read_percent
+				(SELECT COUNT(*) FROM forum_user) AS read_percent
 				FROM forum_thread_read
 				GROUP BY thread_id)';
 
@@ -238,7 +251,7 @@ class Thread extends BaseModel {
     	}
 
         $sql .= " t.id AS t_id, t.title AS t_title, t.category_id AS t_category_id, t.title AS t_title,
-        t.message_count AS t_message_count,
+        t.message_count AS t_message_count, c.simplename AS c_simplename,
         m.first_id AS m_first_id, m.first_sent AT TIME ZONE 'Europe/Helsinki' AS m_first_sent, m.last_id AS m_last_id, m.last_sent AT TIME ZONE 'Europe/Helsinki' AS m_last_sent, m.first_message AS m_first_message, m.last_message as m_last_message,
         uf.id AS u_first_id, ul.id AS u_last_id, uf.name AS u_first_name, ul.name AS u_last_name, uf.admin AS u_first_admin, ul.admin AS u_last_admin, uf.registered AS u_first_registered, ul.registered AS u_last_registered,
         c.name AS c_name,
@@ -266,13 +279,22 @@ class Thread extends BaseModel {
 
         $where = array();
 
-        if($settings['read'] != 'all') {
+        $values = ['all', 'yes', 'no'];
+        if(!in_array($settings['read'], $values)) {
+        	throw new Exception('Unknown read field (' . $settings['read'] . ")");
+        }
+
+        if(!in_array($settings['participated'], $values)) {
+        	throw new Exception('Unknown participated field (' . $settings['participated'] . ")");
+        }
+
+        if($settings['read'] != 'all' && $userId) {
         	 $sql .= " LEFT JOIN forum_thread_read ftr2 ON ftr2.thread_id = t.id AND ftr2.user_id = :read_user_id\n";
         	 $input['read_user_id'] = $userId;
         	 $where[] = 'ftr2.id IS ' . ($settings['read'] == 'yes' ? 'NOT NULL' : 'NULL');
         }
 
-        if($settings['participated'] != 'all') {
+        if($settings['participated'] != 'all' && $userId) {
     		$sql .= " LEFT JOIN forum_message m3 ON m3.thread_id = t.id AND m3.user_id = :participated_user_id\n";
 			$input['participated_user_id'] = $userId;
     		$where[] = 'm3.thread_id IS ' . ($settings['participated'] == 'yes' ? 'NOT NULL' : 'NULL');
@@ -310,7 +332,7 @@ class Thread extends BaseModel {
         	$sql .= " WHERE " . implode("\n AND ", $where) . "\n";
         }
 
-        $sql .= " GROUP BY t.id, t.title, t.category_id, t.message_count, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, uf.name, ul.name, uf.admin, ul.admin, uf.registered, ul.registered, ftr.read_percent\n";
+        $sql .= " GROUP BY t.id, t.title, t.category_id, t.message_count, m.thread_id, m.first_id, m.last_id, m.first_sent, m.last_sent, c.name, m.first_message, m.last_message, uf.id, ul.id, uf.name, ul.name, uf.admin, ul.admin, uf.registered, ul.registered, ftr.read_percent, c.simplename\n";
         
         switch($settings['orderField']) {
         	case "first":

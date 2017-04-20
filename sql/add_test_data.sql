@@ -1,7 +1,7 @@
-INSERT INTO forum_user (name, hash, email, accepted)
-	VALUES ('pera', '$2a$12$b95d8162803b88d3a857cenSizJpkTiLoYYPXrYlcs/CbC2LHGqZS', 'pera@luukku.com', TRUE);
-INSERT INTO forum_user (name, hash, email, accepted, admin)
-	VALUES ('pirjo', '$2a$12$d2a5585d1aa87b20ced77OX2ICyK14WgEPJYJfl3lVD8IqWuk9yjO', 'pirjo@luukku.com', TRUE, TRUE);
+INSERT INTO forum_user (name, hash, email)
+	VALUES ('pera', '$2a$12$b95d8162803b88d3a857cenSizJpkTiLoYYPXrYlcs/CbC2LHGqZS', 'pera@luukku.com');
+INSERT INTO forum_user (name, hash, email, admin)
+	VALUES ('pirjo', '$2a$12$d2a5585d1aa87b20ced77OX2ICyK14WgEPJYJfl3lVD8IqWuk9yjO', 'pirjo@luukku.com', TRUE);
 
 INSERT INTO forum_category (name, "order") VALUES ('Aaaa aaa aa', 1), ('Bbb bbb', 2), ('Ccc cccc', 3);
 
@@ -67,13 +67,12 @@ BEGIN
 			concat(pick_random(fnames), ' ' , pick_random(lnames)) AS name
 		FROM generate_series(1, count))
 
-	 INSERT INTO forum_user (name, hash, email, registered, accepted)
+	 INSERT INTO forum_user (name, hash, email, registered)
 		SELECT DISTINCT ON (name)
 			name,
 			'$2a$12$b95d8162803b88d3a857cenSizJpkTiLoYYPXrYlcs/CbC2LHGqZS' AS hash,
 			REPLACE(LOWER(name), ' ', '.') || '@' || pick_random('{"luukku.com", "gmail.com", "hotmail.com"}'::text[]) AS email,
-			NOW() - '1 year'::interval * random(),
-			TRUE
+			NOW() - '1 year'::interval * random()
 		FROM names;
 END;
 $$ LANGUAGE 'plpgsql';

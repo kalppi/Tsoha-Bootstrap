@@ -41,6 +41,19 @@ class Category extends BaseModel {
 		return new Category($row);
 	}
 
+	public static function exists($c) {
+		if(is_numeric($c)) {
+			$sql = 'SELECT 1 FROM forum_category WHERE id = ?';
+		} else {
+			$sql = 'SELECT 1 FROM forum_category WHERE simplename = ?';
+		}
+
+		$q = DB::connection()->prepare($sql);
+		$q->execute(array($c));
+
+		return $q->fetchColumn() > 0;
+	}
+
 	public static function threadCount() {
 		$q = DB::connection()->prepare(
 			'SELECT COUNT(*) FROM forum_thread'

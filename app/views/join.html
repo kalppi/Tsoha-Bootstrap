@@ -2,15 +2,30 @@
 
 {% block content %}
 	<div class="page-header">
-		<h1>Hae jäseneksi keskusteluun</h1>
+		<h2>Liity keskusteluun</h2>
 	</div>
 
-	<form>
+	{% for error in errors %}
+	<div class="alert alert-danger" role="alert">
+		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		<span class="sr-only">Error:</span>
+		{{error}}
+	</div>
+	{% endfor %}
+
+	<form method="post" action="{{base_path}}/liity" autocomplete="off">
 		<div class="row">
 			<div class="col-xs-4">
 				<div class="form-group">
 					<label>Nimi</label>
-					<input class="form-control" value="" type="text">
+					<input class="form-control" value="{{join_name}}" type="text" name="join-name">
+				</div>
+			</div>
+		</div>
+		<div class="row" style="display: none">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<input class="form-control" value="" type="text" name="join-other">
 				</div>
 			</div>
 		</div>
@@ -18,22 +33,30 @@
 			<div class="col-xs-4">
 				<div class="form-group">
 					<label>Sähköposti</label>
-					<input class="form-control" value="" type="email">
+					<input class="form-control" value="{{join_email}}" type="email" name="join-email">
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-4">
 				<div class="form-group">
-					<label>Lisätietoja</label>
-					<textarea class="form-control"></textarea>
+					<label>Salasana</label>
+					<input class="form-control" value="" type="password" name="join-password">
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-4">
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Lähetä</button>
+					<label>Salasana uudelleen</label>
+					<input class="form-control" value="" type="password" name="join-password2">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary" name="join-submit">Lähetä</button>
 				</div>
 			</div>
 		</div>

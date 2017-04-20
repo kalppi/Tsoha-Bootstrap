@@ -18,7 +18,7 @@
 	</div>
 	<div class="tools">
 		{% if not is_first and not lite  %}
-			{% if replyId != message.id %}
+			{% if replyId != message.id and user %}
 				<a href="{{base_path}}/ketju/{{thread.id}}/vastaa/{{message.id}}#viesti-{{message.id}}">Vastaa tähän</a>
 			{% endif %}
 			<a href="{{base_path}}/viesti/{{message.id}}#viesti-{{message.id}}">Linkki</a>
@@ -26,7 +26,7 @@
 	</div>
 </div>
 
-{% if replyId == message.id %}
+{% if user and replyId == message.id %}
 	<div class="level-{{message.depth + additional_depth}}">
 
 		{% if parent_id == message.id %}

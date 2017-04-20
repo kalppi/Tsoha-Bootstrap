@@ -18,7 +18,7 @@
 			<div class="col-xs-4">
 				<div class="form-group">
 					<label>Sähköposti</label>
-					<input class="form-control" value="" type="email" name="email">
+					<input class="form-control" value="{{login_email}}" type="email" name="login-email">
 				</div>
 			</div>
 		</div>
@@ -26,21 +26,21 @@
 			<div class="col-xs-4">
 				<div class="form-group">
 					<label>Salasana</label>
-					<input class="form-control" value="" type="password" name="password">
+					<input class="form-control" value="" type="password" name="login-password">
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-4">
 				<div class="form-group checkbox">
-					<label><input type="checkbox" value="1" name="remember">Muista minut</label>
+					<label><input type="checkbox" value="1" name="login-remember">Muista minut</label>
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-4">
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary">Lähetä</button>
+					<button type="submit" class="btn btn-primary" name="login-submit">Lähetä</button>
 				</div>
 			</div>
 		</div>

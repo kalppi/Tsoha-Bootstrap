@@ -1,7 +1,7 @@
 <?php
 
 class User extends BaseModel {
-	public $id, $name, $hash, $email, $admin, $accepted, $registered, $deleted;
+	public $id, $name, $hash, $email, $admin, $registered, $deleted;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -12,10 +12,14 @@ class User extends BaseModel {
 	public function validateName() {
 		$errors = array();
 
-		if(empty($this->name)) {
+		if(self::nameExists($this->name)) {
+			$errors[] = 'Nimi on jo käytössä';
+		} else if(empty($this->name)) {
 			$errors[] = 'Nimi ei saa olla tyhjä';
 		} else if(strlen($this->name) < 3) {
 			$errors[] = 'Nimen pitää olla vähintään  3 merkkiä';
+		} else if(!preg_match('#^[a-zäöåA-ZÄÖÅ ]+$#', $this->name)) {
+			$errors[] = 'Nimessä on kiellettyjä merkkejä';
 		}
 
 		return $errors;
@@ -24,7 +28,9 @@ class User extends BaseModel {
 	public function validateEmail() {
 		$errors = array();
 
-		if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+		if(self::emailExists($this->email)) {
+			$errors[] = 'Sähköposti on jo käytössä';
+		} else if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
 			$errors[] = 'Virheellinen sähköpostiosoite';
 		}
 
@@ -33,15 +39,14 @@ class User extends BaseModel {
 
 	public function save() {
 		$q = DB::connection()->prepare(
-			'INSERT INTO forum_user (name, hash, email, accepted, admin) VALUES (:name, :hash, :email, :accepted, :admin) RETURNING id'
+			'INSERT INTO forum_user (name, hash, email, admin) VALUES (:name, :hash, :email, :admin) RETURNING id'
 		);
 
 		$q->execute(array(
 			'name' => $this->name,
 			'hash' => $this->hash,
 			'email' => $this->email,
-			'accepted' => $this->accepted,
-			'admin' => $this->admin
+			'admin' => $this->admin ? 1 : 0
 		));
 
 		$row = $q->fetch();
@@ -58,8 +63,7 @@ class User extends BaseModel {
 	}
 
 	public static function stats($user) {
-		$q = DB::connection()->prepare(
-			'WITH
+		$sql = 'WITH
 				first_messages AS (
 					SELECT DISTINCT ON (thread_id)
 						id, thread_id, message, user_id
@@ -76,15 +80,16 @@ class User extends BaseModel {
 			SELECT
 				u.id AS user_id,
 				COUNT(fm.*) AS start_count,
-				COUNT(fm.*)::float / (SELECT COUNT(*) FROM forum_thread) as start_percent,
+				COUNT(fm.*)::float / (SELECT COUNT(*) FROM forum_thread) AS start_percent,
 				m.count AS message_count,
-				m.count::float / (SELECT COUNT(*) FROM forum_message) as message_percent
+				m.count::float / (SELECT COUNT(*) FROM forum_message) AS message_percent
 			FROM forum_user u
-			INNER JOIN first_messages fm ON fm.user_id = u.id
-			INNER JOIN messages m ON m.user_id = u.id
+			LEFT JOIN first_messages fm ON fm.user_id = u.id
+			LEFT JOIN messages m ON m.user_id = u.id
 			WHERE u.id = :user_id
-			GROUP BY fm.user_id, u.id, m.user_id, m.count'
-		);
+			GROUP BY fm.user_id, u.id, m.user_id, m.count';
+
+		$q = DB::connection()->prepare($sql);
 
 		$q->execute(array('user_id' => $user->id));
 		$row = $q->fetch(PDO::FETCH_ASSOC);
@@ -92,22 +97,22 @@ class User extends BaseModel {
 		return (object)$row;
 	}
 
-	public static function all() {
-		$q = DB::connection()->prepare('SELECT * FROM forum_user');
-		$q->execute();
-		
-		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
-		$users = array();
+	public static function nameExists($name) {
+		$q = DB::connection()->prepare('SELECT id FROM forum_user WHERE name = ?');
+		$q->execute(array($name));
 
-		foreach($rows as $row) {
-			$users[] = new User($row);
-		}
-
-		return $users;
+		return $q->rowCount() > 0;
 	}
 
-	public static function allAccepted() {
-		$q = DB::connection()->prepare('SELECT * FROM forum_user WHERE accepted = TRUE ORDER BY name ASC');
+	public static function emailExists($email) {
+		$q = DB::connection()->prepare('SELECT id FROM forum_user WHERE email = ?');
+		$q->execute(array($email));
+
+		return $q->rowCount() > 0;
+	}
+
+	public static function all() {
+		$q = DB::connection()->prepare('SELECT * FROM forum_user ORDER BY name ASC');
 		$q->execute();
 		
 		$rows = $q->fetchAll(PDO::FETCH_ASSOC);
@@ -122,7 +127,7 @@ class User extends BaseModel {
 
 	public static function find($id) {
 		$q = DB::connection()->prepare('SELECT * FROM forum_user WHERE id = :id LIMIT 1');
-		$q->execute(array('id' => $id));
+		$q->execute(array('id' => intval($id)));
 
 		$row = $q->fetch(PDO::FETCH_ASSOC);
 

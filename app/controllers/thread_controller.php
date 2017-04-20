@@ -2,22 +2,25 @@
 
 class ThreadController extends BaseController {
 	public static function view($id, $replyId = null) {
-		parent::checkLoggedIn();
-
 		$thread = Thread::get($id);
-		$thread->markAsRead(self::getLoggedInUser());
 
-		$messages = Message::allInThread($thread->id);
+		if($thread) {
+			$thread->markAsRead(self::getLoggedInUser());
 
-		$first = array_shift($messages);
+			$messages = Message::allInThread($thread->id);
 
-		View::make('thread.html', array(
-			'title' => 'keskustelu: ' . $thread->title,
-			'thread' => $thread,
-			'messages' => $messages,
-			'message' => $first,
-			'replyId' => $replyId
-		));	
+			$first = array_shift($messages);
+
+			View::make('thread.html', array(
+				'title' => 'keskustelu: ' . $thread->title,
+				'thread' => $thread,
+				'messages' => $messages,
+				'message' => $first,
+				'replyId' => $replyId
+			));	
+		} else {
+			ErrorController::error('ketjua ei löydy');
+		}
 	}
 
 	public static function reply($id, $mId) {

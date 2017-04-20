@@ -35,16 +35,19 @@
         <div class="collapse navbar-collapse" id="navigation">
           <ul class="nav navbar-nav">
             {% if user %}
-            <li><a href="{{base_path}}">Etusivu</a></li>
-            <li><a href="{{base_path}}/jasen/kaikki">Jäsenet</a></li>
-            {% if user.admin %}<li><a href="{{base_path}}/hallinta">Hallinta</a></li>{% endif %}
+              <li><a href="{{base_path}}">Etusivu</a></li>
+              <li><a href="{{base_path}}/jasen/kaikki">Jäsenet</a></li>
+              {% if user.admin %}<li><a href="{{base_path}}/hallinta">Hallinta</a></li>{% endif %}
             {% endif %}
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
             {% if user %}
-            <li><a href="{{base_path}}/jasen/{{user.id}}"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
-            <li><a href="{{base_path}}/ulos"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
+              <li><a href="{{base_path}}/jasen/{{user.id}}"><span class="glyphicon glyphicon-user"></span> {{user.name}}</a></li>
+              <li><a href="{{base_path}}/ulos"><span class="glyphicon glyphicon-log-out"></span> Kirjaudu ulos</a></li>
+            {% else %}
+              <li><a href="{{base_path}}/liity"><span class="glyphicon glyphicon-user"></span> Rekisteröidy</a></li>
+              <li><a href="{{base_path}}/kirjaudu"><span class="glyphicon glyphicon-log-in"></span> Kirjaudu</a></li>
             {% endif %}
           </ul>
         </div>

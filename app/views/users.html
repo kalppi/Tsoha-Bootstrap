@@ -1,12 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+	{% set cols = 4 %}
+	{% set count = (users|length / cols)|round(0, 'ceil') %}
+
 	<h3>Käyttäjät</h3>
 
-	<ul id="users">
-		{% for user in users %}
-		<li><a href="{{base_path}}/jasen/{{user.id}}">{{user.name}}</a></li>
-		{% endfor %}
-	</ul>
+	<div class="container-fluid">
+		<div class="row">
+			{% for i in 0..cols - 1 %}
+				<div class="col-md-{{ 12 / cols }}">
+					<ul id="users">
+						{% for user in users|slice(i * count, count) %}
+						<li><a href="{{base_path}}/jasen/{{user.id}}">{{user.name}}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 
 {% endblock %}
