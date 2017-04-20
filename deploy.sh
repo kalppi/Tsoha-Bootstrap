@@ -9,7 +9,7 @@ echo "Luodaan css..."
 
 bash compilescss.sh
 
-echo "Siirretään tiedostot users-palvelimelle..."
+echo "Siirretään tiedostot palvelimelle..."
 
 # Tämä komento siirtää tiedostot palvelimelta
 rsync -z -r -e "ssh -p $PORT" $DIR/app $DIR/assets $DIR/config $DIR/lib $DIR/sql $DIR/vendor $DIR/index.php $DIR/composer.json $USERNAME@$SERVER:$REMOTE_DIR/$PROJECT_FOLDER
