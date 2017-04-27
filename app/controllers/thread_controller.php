@@ -24,6 +24,8 @@ class ThreadController extends BaseController {
 	}
 
 	public static function reply($id, $mId) {
+		self::checkLoggedIn();
+
 		if(isset($_POST['form-submit'])) {
 			$threadId = isset($_POST['form-thread']) ? $_POST['form-thread'] : null;
 			$parentId = isset($_POST['form-parent']) ? $_POST['form-parent'] : null;
@@ -63,6 +65,8 @@ class ThreadController extends BaseController {
 	}
 
 	public static function createNew() {
+		self::checkLoggedIn();
+
 		$catId = isset($_POST['thread-category']) ? $_POST['thread-category'] : null;
 		$title = isset($_POST['thread-title']) ? $_POST['thread-title'] : null;
 		$msg = isset($_POST['thread-message']) ? $_POST['thread-message'] : null;
@@ -76,7 +80,6 @@ class ThreadController extends BaseController {
 		));
 
 		$message = new Message(array(
-			'thread_id' => $thread->id,
 			'user' => self::getLoggedInUser(),
 			'message' => $msg
 		));
@@ -86,6 +89,8 @@ class ThreadController extends BaseController {
 
 		if(count($errors) == 0) {
 			$thread->save();
+
+			$message->thread_id = $thread->id;
 			$message->save();
 
 			Redirect::to('/ketju/' . $thread->id);

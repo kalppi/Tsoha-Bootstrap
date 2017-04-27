@@ -1,8 +1,8 @@
 <h4>Uusi keskustelu</h4>
 
 <form id="new-thread" method="post" action="{{base_path}}/ketju/uusi">
-	<input type="hidden" name="url" value="?{{url}}"/>
-	<input type="hidden" name="thread-category" value="{{settings.category}}" />
+	<input type="hidden" name="url" value="{{url}}"/>
+	<input type="hidden" name="thread-category" value="{{category_id}}" />
 
 	<div class="form-group row">
 		<label for="thread-title" class="col-md-2 col-form-label">Otsikko</label>

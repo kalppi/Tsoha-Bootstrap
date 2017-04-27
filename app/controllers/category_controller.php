@@ -28,6 +28,13 @@ class CategoryController extends BaseController {
 
 		$settings['category'] = $cat;
 
+		$category = Category::getBy('simplename', $cat);
+		if($category) {
+			$catId = $category->id;
+		} else {
+			$catId = null;
+		}
+ 
 		foreach(array_keys($default) as $k) {
 			if(isset($_GET[$k])) {
 				$settings[$k] = $_GET[$k];
@@ -40,7 +47,7 @@ class CategoryController extends BaseController {
 			$threads = Thread::search($settings);
 		} catch (Exception $e) {
 			if($e instanceof PDOException) {
-				echo "#";
+				ErrorController::error('tietokantavirhe');
 			} else {
 				ErrorController::error('virheellinen hakuparametri');
 			}
@@ -48,10 +55,11 @@ class CategoryController extends BaseController {
 		}
 
 		View::make('threads-list.html', array(
-			'url' => $_SERVER['QUERY_STRING'],
+			'url' => '/alue/' . $cat,
 			'title' => 'keskustelu',
 			'threads' => $threads,
 			'default' => $default,
+			'category_id' => $catId,
 			'settings' => $settings,
 			'settingsInfo' => array(
 				'category' => $cats,

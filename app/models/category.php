@@ -38,6 +38,22 @@ class Category extends BaseModel {
 
 		$row = $q->fetch(PDO::FETCH_ASSOC);
 
+		if(!$row) return null;
+
+		return new Category($row);
+	}
+
+	public static function getBy($field, $value) {
+		$q = DB::connection()->prepare(sprintf(
+			'SELECT * FROM forum_category WHERE %s = :value', $field
+		));
+
+		$q->execute(array('value' => $value));
+
+		$row = $q->fetch(PDO::FETCH_ASSOC);
+
+		if(!$row) return null;
+
 		return new Category($row);
 	}
 

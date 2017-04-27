@@ -24,7 +24,7 @@
 					</ul>
 				</div>
 
-				{% if settings.category != 'all' %}
+				{% if user and settings.category != 'all' %}
 					{% include 'partial/new-thread.html' %}
 				{% endif %}
 				
