@@ -2,8 +2,6 @@
 
 class MessageController extends BaseController {
 	public static function view($id) {
-		parent::checkLoggedIn();
-
 		$message = Message::get($id);
 
 		if($message) {
