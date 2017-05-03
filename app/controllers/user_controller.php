@@ -23,10 +23,6 @@ class UserController extends BaseController {
 
 	public static function join() {
 		if(isset($_POST['join-submit'])) {
-			if(strlen($_POST['login-other']) > 0) {
-				die();
-			}
-
 			$name = trim($_POST['join-name']);
 			$email = trim($_POST['join-email']);
 			$pw = $_POST['join-password'];
@@ -52,6 +48,10 @@ class UserController extends BaseController {
 
 			if(count($errors) == 0) {
 				$user->save();
+
+				$loginToken = LoginToken::generate($user);
+
+				$_SESSION['token'] = $loginToken->token;
 
 				Redirect::to('/');
 			} else {
