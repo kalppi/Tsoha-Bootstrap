@@ -16,10 +16,60 @@ class ThreadController extends BaseController {
 				'thread' => $thread,
 				'messages' => $messages,
 				'message' => $first,
-				'replyId' => $replyId
+				'replyId' => $replyId,
+				'canEdit' => true
 			));	
 		} else {
 			ErrorController::error('ketjua ei löydy');
+		}
+	}
+
+	public static function edit($id, $mId) {
+		self::checkLoggedIn();
+
+		if(isset($_POST['form-submit'])) {
+			$threadId = isset($_POST['form-thread-id']) ? $_POST['form-thread-id'] : null;
+			$messageId = isset($_POST['form-message-id']) ? $_POST['form-message-id'] : null;
+			$msg = isset($_POST['form-message']) ? $_POST['form-message'] : null;
+
+			$message = Message::get($mId);
+
+			$user = self::getLoggedInUser();
+
+			if($message->user->id != $user->id && !$user->admin) {
+				die();
+			} 
+
+			$message->message = $msg;
+
+			$errors = $message->errors();
+
+			if(count($errors) == 0) {
+				$message->save();
+
+				Redirect::to(sprintf('/ketju/%s#viesti-%s', $threadId, $message->id));
+			} else {
+				Redirect::to(sprintf('/ketju/%s/muokkaa/%s', $threadId, $message->id), array(
+					'errors' => $errors,
+					'msg' => $msg
+				));
+			}
+		} else {
+			$thread = Thread::get($id);
+
+			if($thread) {
+				$thread->markAsRead(self::getLoggedInUser());
+
+				$message = Message::get($mId);
+
+				View::make('edit.html', array(
+					'title' => 'keskustelu: ' . $thread->title,
+					'thread' => $thread,
+					'message' => $message
+				));	
+			} else {
+				ErrorController::error('ketjua ei löydy');
+			}
 		}
 	}
 

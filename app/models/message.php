@@ -24,20 +24,31 @@ class Message extends BaseModel {
 	}
 
 	public function save() {
-		$q = DB::connection()->prepare(
-			'INSERT INTO forum_message (thread_id, parent_id, user_id, message) VALUES (:thread_id, :parent_id, :user_id, :message) RETURNING id'
-		);
+		if($this->id) {
+			$q = DB::connection()->prepare(
+				'UPDATE forum_message SET message = :message WHERE id = :id'
+			);
 
-		$q->execute(array(
-			'thread_id' => $this->thread_id,
-			'parent_id' => $this->parent_id,
-			'user_id' => $this->user->id,
-			'message' => $this->message
-		));
+			$q->execute(array(
+				'id' => $this->id,
+				'message' => $this->message
+			));
+		} else {
+			$q = DB::connection()->prepare(
+				'INSERT INTO forum_message (thread_id, parent_id, user_id, message) VALUES (:thread_id, :parent_id, :user_id, :message) RETURNING id'
+			);
 
-		$row = $q->fetch();
+			$q->execute(array(
+				'thread_id' => $this->thread_id,
+				'parent_id' => $this->parent_id,
+				'user_id' => $this->user->id,
+				'message' => $this->message
+			));
 
-		$this->id = $row['id'];
+			$row = $q->fetch();
+
+			$this->id = $row['id'];
+		}
 	}
 
 	public static function get($id) {

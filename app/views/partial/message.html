@@ -18,6 +18,10 @@
 	</div>
 	<div class="tools">
 		{% if not is_first and not lite  %}
+			{% if message.user.id == user.id or user.admin == true %}
+				<a href="{{base_path}}/ketju/{{thread.id}}/muokkaa/{{message.id}}">Muokkaa</a>
+			{% endif %}
+
 			{% if replyId != message.id and user %}
 				<a href="{{base_path}}/ketju/{{thread.id}}/vastaa/{{message.id}}#viesti-{{message.id}}">Vastaa tähän</a>
 			{% endif %}
