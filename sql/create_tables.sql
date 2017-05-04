@@ -28,7 +28,8 @@ CREATE TABLE forum_message (
 	parent_id INTEGER REFERENCES forum_message (id) ON UPDATE CASCADE ON DELETE CASCADE DEFAULT NULL,
 	user_id INTEGER REFERENCES forum_user (id) ON UPDATE CASCADE ON DELETE CASCADE,
 	sent TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-	message TEXT NOT NULL
+	message TEXT NOT NULL,
+	deleted BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE forum_thread_read (
@@ -51,6 +52,10 @@ CREATE OR REPLACE RULE set_user_deleted_flag AS
 	DO INSTEAD
 		UPDATE forum_user SET deleted = TRUE WHERE id = OLD.id;
 
+CREATE OR REPLACE RULE set_message_deleted_flag AS
+	ON DELETE TO forum_message
+	DO INSTEAD
+		UPDATE forum_message SET deleted = TRUE WHERE id = OLD.id;
 
 CREATE OR REPLACE FUNCTION generate_simplename() RETURNS TRIGGER AS $$
 BEGIN
@@ -77,9 +82,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION decrease_message_count() RETURNS TRIGGER AS $$
 BEGIN
 	UPDATE forum_thread SET message_count = message_count - 1
-		WHERE id = NEW.thread_id;
+		WHERE id = OLD.thread_id;
 
-	RETURN NEW;
+	RETURN OLD;
 END
 $$ LANGUAGE plpgsql;
 

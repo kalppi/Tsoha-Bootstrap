@@ -24,6 +24,24 @@ class ThreadController extends BaseController {
 		}
 	}
 
+	public static function delete($id, $mId) {
+		self::checkLoggedIn();
+
+		$message = Message::get($mId);
+
+		if(!$message) return;
+
+		$user = self::getLoggedInUser();
+
+		if($message->user->id != $user->id && !$user->admin) {
+			die();
+		}
+
+		$message->delete();
+
+		Redirect::to(sprintf('/ketju/%s', $id));
+	}
+
 	public static function edit($id, $mId) {
 		self::checkLoggedIn();
 

@@ -8,6 +8,7 @@ $get = array(
 	'/ketju/:id' => 'ThreadController::view',
 	'/ketju/:id/vastaa/:mid' => 'ThreadController::reply',
 	'/ketju/:id/muokkaa/:mid' => 'ThreadController::edit',
+	'/ketju/:id/poista/:mid' => 'ThreadController::delete',
 	'/viesti/:id' => 'MessageController::view',
 	'/jasen/kaikki' => 'UserController::all',
 	'/liity' => 'UserController::join',

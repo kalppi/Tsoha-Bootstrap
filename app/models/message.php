@@ -1,7 +1,7 @@
 <?php
 
 class Message extends BaseModel {
-	public $id, $thread_id, $parent_id, $sent, $message, $user, $depth;
+	public $id, $thread_id, $parent_id, $sent, $message, $user, $depth, $deleted;
 
 	public function __construct($attributes) {
 		parent::__construct($attributes);
@@ -21,6 +21,16 @@ class Message extends BaseModel {
 		}
 
 		return $errors;
+	}
+
+	public function delete() {
+		$q = DB::connection()->prepare(
+			'DELETE FROM forum_message WHERE id = :id'
+		);
+
+		$q->execute(array(
+			'id' => $this->id
+		));
 	}
 
 	public function save() {
@@ -178,15 +188,15 @@ class Message extends BaseModel {
 	public static function allInThread($id) {
 		$q = DB::connection()->prepare(
 			'WITH RECURSIVE messages_path AS (
-				(SELECT id, user_id, sent, parent_id, message, ARRAY[id]::INTEGER[] AS path, 0 AS depth
+				(SELECT id, user_id, sent, parent_id, message, deleted, ARRAY[id]::INTEGER[] AS path, 0 AS depth
 				FROM forum_message WHERE parent_id IS NULL AND thread_id = :thread_id)
 
 				UNION ALL
 
-				(SELECT m.id, m.user_id, m.sent, m.parent_id, m.message, mp.path || m.id, depth + 1 AS depth
+				(SELECT m.id, m.user_id, m.sent, m.parent_id, m.message, m.deleted, mp.path || m.id, depth + 1 AS depth
 				FROM forum_message m, messages_path mp
 				WHERE m.parent_id = mp.id)
-			) SELECT m.id, m.sent AT TIME ZONE \'Europe/Helsinki\' AS sent, m.message, m.depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
+			) SELECT m.id, m.sent AT TIME ZONE \'Europe/Helsinki\' AS sent, m.message, m.deleted, m.depth, m.parent_id, u.id AS u_id, u.name AS u_name, u.admin AS u_admin
 				FROM messages_path m
 				INNER JOIN forum_user u ON m.user_id = u.id
 				ORDER BY path ASC, sent ASC, id ASC'
@@ -201,14 +211,14 @@ class Message extends BaseModel {
 			$user = new User(array(
 				'id' => $row['u_id'],
 				'name' => $row['u_name'],
-				'admin' => $row['u_admin']
+				'admin' => $row['u_admin'],
 			));
 
 			$row['user'] = $user;
 
 			$messages[] = new Message($row);
 		}
-
+		
 		return $messages;
 	}
 }
